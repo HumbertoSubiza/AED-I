@@ -1,0 +1,242 @@
+---
+title: "Datas"
+author: "Walter Humberto Subiza Pina"
+date: "23 de março de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Lubridate exercícios
+ 
+  Como em muitas linguagens de programação, trabalhar com dados e tempo pode ser frustrante, já que existem diferentes formatos e diferentes zonas de tempos, incluindo horários de verão específicos.
+
+Lubridate é um pacote criado para facilitar o trabalho com data e tempo, foi criado por **Garrett Grolemund e Hadley Wickham** e vem incluído no pacote _"tidyverse"_.
+
+Para fazer o R entender que trabalhamos com esse tipo específico de dados, o primeiro é identificar nos nossos dados, qual a ordem em que aparecem o ano, mês e dia, feito isso podemos ordenar "y", "m", e "d" na mesma ordem e esse vai ser o nome da função de lubridate a usar.
+
+---
+
+```{r, warning=FALSE, message=FALSE}
+#install.packages("lubridate") # Se necessário instale o pacote primeiro
+
+library(lubridate)
+# Veja que qualquer formato é valido, desde que seja especificado a ordem correta...
+dmy("30032017")       # dia mes ano
+mdy("03302017")        # mes dia ano
+mdy("03-30-2017")      # separador "-"
+dmy("30/03/2017")      # separador "/"
+
+# se simplesmente atribuimos valores, não serão tomados como data...
+amd <- (2017/03/30)
+amd
+class(amd)
+
+# mas usando lubridate...
+amd <- ymd("2017/03/30")
+amd
+class(amd)
+```
+
+---
+
+Quando seus dados incluam informação de tempo, adicione _h, m, s_ ao nome da função. A função _ymd_hms_, deve ser uma das mais usada como formato de data/tempo.
+
+Se precisamos ler datas numa determinada zona de tempo, coloque o nome oficial na variável **tz** (time zone). Consulte a documentação anexa para saber os nomes oficiais por zona (<https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>).
+
+```{r}
+chegada <- ymd_hms("2017-03-30 08:00:00", tz = "America/Bahia")
+chegada
+class(chegada)
+```
+
+---
+
+####Colocando ou extraindo informação de dados de data/tempo
+
+Podemos extrair dados específicos com as funções: _second, minute, hour, day, wday, yday, week, month, year, e tz_. 
+
+Da mesma maneira podemos inserir dados específicos, mas fique atento às modificações feitas.
+
+Com as funções _wday e month_ podemos saber dos nomes específicos do dia da semana ou do mês.
+
+---
+
+```{r}
+# Extraindo
+hour(chegada)
+
+day(chegada)
+
+wday(chegada, label=T)
+months(chegada, abbreviate = T)
+```
+
+---
+
+####Zonas de tempo
+
+Podemos fazer duas coisas interessantes com datas e zonas horárias:
+
+1-ver o mesmo momento em diferentes zonas horárias
+
+2-calcular um momento através da combinação de um instante de tempo e uma nova zona horária
+
+As duas coisas são feitas com as funções with_tz e force_tz.
+ 
+Exemplo, um mês atrás, eu estava em Portugal e fiquei em ter uma conversa com uma pessoa usando Skype, no dia 1 de abril, às 9 da manhã no horário de Lisboa. 
+
+Agora estou no Rio de Janeiro, e queiro saber a que horas vou conversar com ela.
+
+---
+
+```{r}
+conversa <- ymd_hms("2017-04-01 09:00:00", tz = "Europe/Lisbon")
+with_tz(conversa, "America/Bahia")
+
+# Vou ter de madrugar!!! ... e se a pessoa estivesse no Japão??
+
+conversa <- ymd_hms("2017-04-01 09:00:00", tz = "Asia/Tokyo")
+with_tz(conversa, "America/Bahia")
+```
+
+---
+
+Reparem que a conversa do dia 1 de abril, vai acontecer no dia 31 de março aqui...
+
+---
+
+####Intervalos de tempo
+
+Assim também podemos calcular e guardar intervalos de tempo, nesse caso como uma classe específica, intervalo. Por exemplo:
+
+mi estadia em Lisboa foi entre os dias 4 de março e 10 de março.
+
+Posso calcular e guardar esse intervalo, das duas seguintes formas:
+
+---
+
+```{r}
+# 1  usando a função interval e especificando o começo e o fim do intervalo
+chegada <- ymd_hms("2017-03-04 06:00:00", tz = "Europe/Lisbon")
+partida <- ymd_hms("2017-03-10 17:00:00", tz = "Europe/Lisbon")
+lisboa <- interval(chegada, partida) 
+lisboa
+
+# 2 com a funçã0 %--% entre o começo e o fim...
+lisboa2 <- chegada %--% partida
+lisboa2
+
+# se desejar saber a duração em determinada unidade como dia, devemos transformar o objeto da
+# classe intervalo para a classe período
+as.period(lisboa)
+```
+
+---
+
+Explore outras funções que trabalham com intervalos como: _int_start, int_end, int_flip, int_shift, int_aligns, union, intersect, setdiff, e %within%_.
+
+---
+
+####Cálculos com data e tempo
+
+Intervalos são períodos de tempo específicos, e estão atrelados a datas específicas.
+
+Lubridate tem duas classes de períodos de tempo, chamados de Durations e Periods (duração e período).
+
+Para criar **períodos**, a função é a unidade de tempo em plural.
+
+Para criar **duração** de tempo, se usa a mesma função precedida da letra "d".
+
+---
+
+```{r}
+minutes(200) ## periodo
+
+dminutes(200) ## duração
+```
+
+---
+
+A que é devido a necessidade de duas classes diferentes?
+
+Acontece que tempo não é igual a número. Duração sempre vai fornecer resultados matemáticos precisos, por exemplo a duração de um ano é 365 dias, mas o período de um ano pode ser 365 ou 366 dias.
+
+Veja os seguintes casos de um ano bissexto e outro não:
+
+---
+
+```{r}
+leap_year(2015) # 2015 é um ano bissexto?
+
+# usar duração ou período não faz diferença...
+ymd(20150101) + dyears(1)
+ymd(20150101) + years(1)
+
+# no caso de ano bissexto, o resultado é diferente...
+leap_year(2016) # 2016 é bissexto??
+ymd(20160101) + dyears(1) # duração de 1 ano...
+ymd(20160101) + years(1)  # período de 1 ano...
+```
+  
+---  
+
+As duas classes podem ser objeto de cálculo de aritmética básica, 
+
+Por exemplo, se desejamos agendar nossa conversa toda semana por mais dois meses:
+
+---
+
+```{r}
+conversas <- conversa + weeks(0:8)  
+conversas  
+```
+
+---
+
+Finalmente vamos ver como trabalhar com datas num arquivo de dados. Carregamos o arquivo "clima_clean.txt" e verificamos sua estrutura:
+
+
+```{r}
+clima <- read.table("clima_clean.txt") 
+str(clima)
+```
+
+---
+
+Vemos que a variável "Date" que deveria ser data, foi tomada como fator.
+
+A transformação da variável "Date" em classe data, pode ser feito de duas formas:
+
+```{r}
+# 1- com lubridate, função ymd:
+clima$date <- ymd(clima$date)
+
+# 2- ou declarando a variável como data, com as.Date:
+clima$date <- as.Date(clima$date)
+
+str(clima)
+```
+
+---
+
+Assim sendo podemos fazer os cálculos e manipulações já vistas, como por exemplo calcular o período de tempo dos nossos dados:
+
+```{r}
+(periodo <-  as.period(clima$date[1] %--% clima$date[282]))
+```
+
+---
+
+####FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "03_lubridate.Rdata")
+```
+
+

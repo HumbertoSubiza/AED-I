@@ -1,0 +1,158 @@
+---
+title: "Oficina AED"
+author: "Walter Humberto Subiza Pina"
+date: "22 de fevereiro de 2017"
+output: 
+  html_document: 
+    fig_height: 7
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+
+## Introdução ao Análise Exploratório de Dados
+
+---
+
+#### 0- Coleção de pacotes _**tidyverse**_
+
+##### Filosofia
+
+O pacote tidyverse, se define como uma coleçao de pacotes R, que tem uma filosofia comum e estão criados para trabalhar em conjunto. Contém vários pacotes que já usamos na importação de dados e ainda outros que vamos usar na limpeza e preparação de dados, como _tidyr_ e _dplyr_ (veja na documentação para um detalhe dos pacotes incluídos).
+
+As principais idéias por trás de tidyverse são:
+
+1- Re-aproveitar estruturas de dados que já existem
+
+2- Facilitar a leitura dos programas e fragmentos de programas, através do uso do operador "pipe": %>% (tubulazão)
+
+Por exemplo, em lugar de escrever 
+
+f2(f1(dados)), podemos escrever
+
+dados %>% f1 %>% f2
+
+3- Ter um desenho de função consistente e funcional. Por exemplo, o primeiro argumento de qualquer função são os dados.
+
+4- Está escrito para personas, ou como Hal Abelson escreveu:
+
+**"Os programas devem ser escritos para as pessoas lerem e ocassionalmente para as máquinas executarem."**
+
+---
+
+#### 1- Conheça os dados
+
+---
+
+Conheça primeiro os dados dos quais vai tratar, essas são algumas das funções que ajudam na tarefa:
+
+
+
+|    | função     |   descrição                                     |
+|----|------------|-------------------------------------------------|
+| 1- | class()    |   Classe do objeto de dados                     |
+| 2- | head()     |   Mostra os primeiros (n=6) registros do arquivo|
+| 3- | tail()     |   Mostra os últimos (n=6) registros do arquivo  |
+| 4- | dim()      |   Dimensão dos dados (linhas x colunas)         |
+| 5- | names()    |   Nomes das colunas                             |
+| 6- | str()      |   estrutura dos dados                           |
+| 7- | summary()  |   resumo estatístico dos dados                  |
+| 8- | glimpse()  |   versão diferente do str()(pacote dplyr)       |
+| 9- | Describe() |   versão diferente do summary() (pacote pysch)  |
+
+---
+
+Vamos trabalhar com o arquivo "airquality" do pacote de base de dados R "datasets" e armazenar ele como "air" simplesmente.
+
+```{r}
+library(datasets)
+air <- airquality
+```
+
+
+Exploremos os dados: que classe de dados são?
+
+
+```{r}
+class(air)
+
+```
+
+Vamos ver os primeiros 10 registros e os últimos 5:
+
+
+```{r}
+head(air, 10)
+tail(air,5)
+```
+
+
+Já vimos que é um "dataframe", vamos ver agora quantas linhas/colunas tem e como se chaman.
+
+```{r}
+dim(air)
+names(air)
+```
+
+Vejamos agora qual a estrutura do dataframe, com tipo de variáveis e um resumo de seus dados.
+
+```{r}
+str(air)
+summary(air)
+```
+
+A função **str()**, nos informa que tipo de variável estamos trabalhando, vemos por exemplo que temos alguns dados faltando (NAs) e que as variáveis são do tipo inteiro e numérico (decimal). Uma variável chamada "Month" poderia ser considerada fator num análise posterior.
+
+A função **summary()** nos fornece as principais estatísticas das variável do arquivo, incluindo os 5 valores do boxplot e a média de cada uma. Também temos uma contagem de valores NA para cada variável. Isto é importante depois no análise já que vamos ter de decidir que fazer com eles.
+
+Vejamos agora qual a diferença do **str()**  com a função **glimpse()** do pacote _dplyr_ e da função **describe()** do pacote _psych_ com o **summary()**.
+
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+glimpse(air)
+
+library(psych)
+describe(air)
+```
+
+Basicamente **glimpse()**  fornece a mesma informação do **str()**, mas no caso de **describe()**, ela fornece estatísticas mais completas que o **summary()** e conta a quantidade de valores existentes para cada variável (no caso de "Ozone", por exemplo, temos 116 valores num total de 156 registros).
+
+---
+
+Para finalizar esse nosso primeiro contato com os dados, podemos visualizar a distribuição ou verificar o comportamento de algumas variáveis. A função mais adequada nessa etapa é **plot()**.
+
+Vamos plotar uma variável, por exemplo "Temperatura".
+
+
+```{r}
+plot(air$Temp)
+
+```
+
+Esse simples gráfico já nos informa que o valor da variável vai se incrementando ao longo do arquivo para finalmente decrescer novamente.
+
+
+---
+
+Se queremos ver se existem valores extremos a analisar numa etapa posterior, a função **boxplot()** nos dá uma rápida visão..Vejamos a variável "Wind", ou seja Vento..
+
+
+```{r}
+boxplot(air$Wind, horizontal=T)
+
+```
+
+---
+
+Nessa variável temos valores a considerar mais adiante..
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "01_Intro_all.Rdata")
+```

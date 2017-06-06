@@ -1,0 +1,313 @@
+---
+title: "Oficina AED"
+author: "Walter Humberto Subiza Pina"
+date: "24 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Introdução ao Análise Exploratório de Dados
+
+---
+
+####2- Preparando os dados com **tidyverse::tidyr**
+
+---
+
+Voltamos aos princípios da exploração de dados, os dados tem de estar arrumados da seguinte forma:
+
+---
+
+####1- Observações em linhas!! cada observação completa deve ocupar uma linha
+
+---
+
+####2- As variáveis tem de estar em colunas, uma variável =  uma coluna!!!
+
+---
+
+####3- Apenas um tipo de pesquisa por tabela
+
+---
+
+O pacote **tidyr** foi criado por Hadley Wickman, está incluído na coleção _tidyverse_ e aplica esses princípios sendo fácil e simples de usar. Com ele vamos fazer a primeira limpeza grossa dos dados, por exemplo, transformar dados de longos a largos ou viceversa ou ainda juntar ou separar colunas (variáveis).
+
+A segunte tabela resume as funções principais do pacote **tidyr**.
+
+---
+
+
+|função    | descrição                         |exemplo                            |
+|----------|-----------------------------------|-----------------------------------|
+| gather()| junta colunas baseado em valores determinados|gather(dados, chave, colnova, -cols) |
+|separate()| separa uma coluna em várias colunas ou linhas|separate(dados, col, into, sep="") |
+|spread()| separa valores determinados em colunas|spread(dados, chave, col,...)  |
+|unite()| une várias colunas em uma só|unite(dados, col,...) |
+
+---
+
+####1- Função gather()
+
+Exemplos de dados crus, ou sujos ou bagunçados...
+
+---
+
+As colunas são valores em vez de ser variáveis!!
+
+
+```{r}
+ibge <- read.table("ibge.csv", header=T, row.names = 1)
+ibge
+#
+# vamos usar a função gather para juntar os valores das colunas numa variável única; "Complexo"
+# Explicitamente seria como falar: dos dados "ibge", me junta as colunas "Valor", "Sede" e "Canabarro", 
+# numa nova coluna a criar "Complexo"...
+ibge2 <- gather(ibge, Complexo, Valor, Sede, Lucas, Canabarro)
+ibge2
+#
+# temos ainda o problema dos registros repetidos e que não tem sentido..
+subset(ibge2, Valor >0, select = 1:4)
+```
+
+
+Um outro exemplo, mais curto
+
+```{r}
+col.nomes <- c("Col", "A","B","C")
+df <- read.table("df.csv", header=T, row.names = 1, col.names = col.nomes)
+df
+gather(df,chave,valor,-Col)
+```
+
+
+Vejamos agora um exemplo mais completo:
+
+Importamos um arquivo que contém o Indice de Preços ao Consumo entre os anos 2010 a 2016 para 10 categorias da economia.
+
+Fonte: IBGE
+
+Após a importação vamos conhecer o arquivo e as variáveis.
+
+```{r}
+inpc <- read.csv2("inpc.csv")
+```
+
+---
+
+####Responda:
+1- qual o formato do arquivo e tamanho?
+
+2- qual o tipo de variáveis e quantas são?
+
+3- tem valores faltantes (NAs)?
+
+---
+
+
+```{r, warning=FALSE, message=FALSE}
+head(inpc)
+str(inpc)
+# uma forma rápida de contar quantos valores faltam no arquivo:
+sum(is.na(inpc))
+
+# outra forma de ver os dados é com a função dplyr::glimpse
+dplyr::glimpse(inpc)
+```
+
+---
+
+
+Quais problemas aparenta ter o arquivo "inpc"?
+ 
+ - nomes das colunas tem por padrão incluído a letra "X"
+ 
+ - as colunas são valores e não variáveis!
+ 
+Os valores armazenados nas colunas X01-X12 na realidade são _valores de uma variável que poderia ser "mes"_.
+
+---
+
+
+####Primeiro problema, vamos resolver com a função stringr::str_replace 
+
+
+```{r, warning=FALSE}
+# primero tomamos o cabeçalho do arquivo: "names(inpc)", logo
+# substituimos a letra X por nada: "str_replace(names(inpc), "X", "")" (stringr:: chama o pacote stringr)
+# e na sequencia inserimos o resultado como cabeçalho novamente "names(inpc) <-"
+names(inpc) <- stringr::str_replace(names(inpc), "X", "")
+
+# vejamos como ficou o arquivo
+head(inpc)
+str(inpc)
+```
+
+
+---
+
+
+####segundo problema
+
+Colocando colunas de dados em pares variável:valor. 
+
+A variável aqui é mes(1-12). Usamos tidyr::gather quando temos colunas que não são variáveis e desejamos colocarlas como valores.
+
+O gather(), como já vimos em exemplos anteriores, transforma um arquivo com muitas colunas (largo) e poucos registros em arquivos longos com muitos registros e poucas variáveis.
+
+função:
+
+gather(dado_longo, nova_variável, valor, -cols), sendo -cols as colunas a ignorar.
+
+```{r}
+inpc2 <- gather(inpc, mes, valor, -N,-ano,-categoria,-categoria_str)
+# poderia ter colocado também, -c(1:4) como colunas a ignorar..
+head(inpc2, 20)
+# observe como os dados foram ordenados por mes, categoria e depois ano..
+
+# vamos relembrar o caso dos valores faltantes. Para ter o total de dados faltantes usamos
+# os valores lógicos True = 1 e False = 0, então:
+sum(is.na(inpc2))
+
+# eliminando os registros com NAs:
+inpc3 <- inpc2[complete.cases(inpc2),]
+str(inpc3)
+
+# vamos ver um resumo do arquivo. Que se nota em quanto ao tipo de variáveis?
+summary(inpc3)
+```
+
+
+---
+
+Nos interessa ter o ano e o mes como variável fator, assim a transformação é:
+
+```{r}
+inpc3$ano <- as.factor(inpc3$ano)
+inpc3$mes <- as.factor(inpc3$mes)
+str(inpc3)
+summary(inpc3)
+```
+
+---
+
+Veja agora como é facil separar conjuntos de dados por categoria ou ano...
+
+---
+
+
+```{r}
+# por ano e mes, junho de 2010, lembre que os meses agora são carateres com espaço em branco
+# " 3"
+inpc_201006 <- subset(inpc3, ano =="2010" & mes=="6")
+head(inpc_201006)
+
+# por categoria.. indice geral de precos do ano 2012
+inpc_cat0 <- subset(inpc3, categoria == 0 & ano == "2012")
+head(inpc_cat0)
+
+# agora um gráfico para visualizar dados
+plot(sort(as.numeric(inpc_cat0$mes)),inpc_cat0$valor, 
+     main = "Indice Geral de Preços ao Consumo - 2012", 
+     type="b",
+     xlab= "Mês",
+     ylab= "Variação percentual")
+```
+
+
+#### experimente extrair outros dados e faça um gráfico
+
+---
+
+---
+
+####2 -  Função separate()
+
+Essa função é usada quando temos mais de uma variável numa única coluna e desejamos separá-la para um melhor análise. 
+A sintaxe da função, como vimos é:
+
+separate(dados, col, into, sep=""), com "col" sendo a coluna a divivir, "into" sendo as novas variáveis a serem criadas e "sep" o separador que será usado para a divisão da coluna
+
+
+Vamos carregar uma versão do nosso arquivo inpc, agora com menos variáveis.
+
+---
+
+
+```{r}
+inpc_ibge <- read.csv2("inpc4.csv")
+head(inpc_ibge)
+```
+
+---
+
+---
+
+Vamos separar primeiro a coluna "Data" e na sequência a coluna "Categoria".
+
+
+```{r}
+inpc_ibge2 <- separate(inpc_ibge, Data, c("ano", "mes"),sep="/")
+head(inpc_ibge2)
+
+#
+inpc_ibge3 <- separate(inpc_ibge2, Categoria, c("categoria_n", "categoria"),sep="_")
+head(inpc_ibge3)
+
+```
+
+
+---
+
+É possível separar uma coluna em linhas, usando separate_rows(), veja a ajuda.
+
+---
+
+
+####3- Função spread()
+
+A função **spread()** coloca os valores de uma coluna determinada en novas colunas, espalhando os valores da coluna nas novas colunas que são criadas.
+
+```{r}
+d1 <- read.csv("d1.csv", header=T)
+head(d1)
+df_ibge <- spread(d1, tipo, valor)
+df_ibge
+```
+
+Isto permite, por exemplo, fazer operações vetorizadas e cálculos, como na sequência:
+
+
+```{r}
+df_ibge2 <- dplyr::mutate(df_ibge, densidade = round(pop/territorio,2))
+df_ibge2
+
+```
+
+---
+
+####4- Função unite
+
+Essa função junta as células de diversas colunas para formar uma única coluna. É a operação inversa de **separate()**, por exemplo, do arquivo "inpc_ibge2", vamos juntar as colunas "ano" e "mes", numa única coluna "data":
+
+```{r}
+head(inpc_ibge2, 12)
+inpc_unite <- unite(inpc_ibge2, ano, mes, col="data", sep="/")
+head(inpc_unite, 12)
+
+```
+
+---
+
+FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "02_tidy1_all.Rdata")
+```
+

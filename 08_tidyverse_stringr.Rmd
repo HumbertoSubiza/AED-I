@@ -1,0 +1,154 @@
+---
+title: "Stringr"
+author: "Walter Humberto Subiza Pina"
+date: "24 de março de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Manipulação e tratamento de variáveis texto com _stringr_
+
+#### Limpando dados texto
+
+O pacote _stringr_ pertence à coleção _tidyverse_ e prove facilidades para tratamento de variáveis texto.
+
+Uma tarefa simples que muita vezes é preciso fazer, é remover espaços em branco ao começo ou no final de variáveis texto.
+
+A função _str_trim()_ realiza facilmente a operação, sem eliminar a parte de interesse.
+
+---
+
+```{r warning=FALSE}
+library(stringr)
+texto <- c("  this is a test     ")
+texto
+
+str_trim(texto)
+```
+
+---
+
+Em forma semelhante quando necessitamos preencher uma determinada quantidade de caracteres
+de comprimento. Por exemplo, identificação de um funcionário. Quando lemos dados podemos de alguma forma perder zeros no começo da variável
+
+
+```{r}
+siape <- 0748362
+siape
+
+str_pad(siape, width = 7, side = "left", pad = "0")
+
+```
+
+----
+
+####Exercício
+
+Limpe o seguinte vetor de nomes de espaços não necessários
+nomes <- c("   Patricia  ", "Aline   ", " Darlan")
+
+
+Na sequência, padronize o vetor para comprimento de 25 caracteres cada elemento
+
+Finalmente padronize o vetor numéricoseguinte para comprimento de 7 para cada elemento, inclua zeros na frente quando necessário.
+
+siapes <- c(79456, 1495887, 94378)
+
+####solução 
+
+```{r}
+nomes <- c("   Patricia  ", "Aline   ", " Darlan")
+nomes2 <- str_trim(nomes)
+nomes2
+```
+
+
+```{r}
+str_pad(nomes2, width = 25, pad = " ")
+# ou
+
+str_pad(str_trim(nomes), width = 25, pad = " ")
+
+```
+
+---
+
+####Caixa alta e caixa baixa
+
+As vezes precisamos ajustar a caixa do texto e para isso temos duas funções do pacote _base_ do R, elas são _toupper()_ e _tolower()_. Essas funções tomam apenas um argumento texto, que pode ser um vetor ou coluna, e convertem todos os caracteres para a caixa desejada. 
+
+---
+
+####Exercício
+
+Vamos ler um arquivo que contém os nomes dos estados do Brasil e sua correspondente sigla e ver os primeiros registros
+
+```{r}
+estados <- read.table("estados.txt", header=T, sep="\t")
+head(estados)
+```
+
+Como podemos ver, a sigla dos estados está em caixa alta, guardar num novo vetor "estados_sigla" as siglas de todos os estados mas em caixa baixa.
+
+
+```{r}
+estados_sigla <- tolower(estados$SIGLA)
+estados_sigla
+```
+
+Agora vamos modificar nossa variável estados, deixando os nomes dos estados em caixa alta, imprima os últimos 6 registros.
+
+```{r}
+estados$ESTADO <- toupper(estados$ESTADO)
+tail(estados)
+```
+
+---
+
+####Localizando e substituindo caracteres
+
+Duas funções de _stringr_ nos permitem encontrar e reemplazar carateres: _str_detect()_ e _str_replace()_.
+
+Como toda função do pacote, o primeiro argumento é a variável de interesse, o segundo é o padrão que procuramos, no caso de _ str_detect()_ o padrão que procuramos e no caso de _str_replace()_ o padrão que procuramos substituir. 
+
+Nessa última função temos o terceiro argumento que é o caracter que vai substituir o padrão achado.
+
+---
+
+####Exercício
+
+Com nosso dataframe "estados", procure os estados que pertencem a região Sul. Veja que colocamos o padrão de procura como "N$", de forma de indicar que o padrão deve **finalizar** com "N", se não especificamos assim, a função trará também os estados do nordeste ("ND").
+
+```{r}
+estados[str_detect(estados$REGIÃO, "N$"),]
+```
+
+---
+
+Podemos usar _str_replace_ para mudar o nome das regiões para um nome completo como por exemplo, "N" para "Norte" e assim por diante. A mudança tem de ver feita uma por vez.
+
+---
+
+```{r}
+estados$REGIÃO <- str_replace(estados$REGIÃO, "N$", "Norte")
+estados$REGIÃO <- str_replace(estados$REGIÃO, "S$", "Sul")
+estados$REGIÃO <- str_replace(estados$REGIÃO, "ND", "Nordeste")
+estados$REGIÃO <- str_replace(estados$REGIÃO, "SD", "Sudeste")
+estados$REGIÃO <- str_replace(estados$REGIÃO, "CO", "Centro-oeste")
+estados
+```
+
+---
+
+FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "04_stringr.Rdata")
+```
+
