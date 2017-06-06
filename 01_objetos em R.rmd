@@ -1,0 +1,189 @@
+---
+title: "Objetos em R"
+author: "Walter Humberto Subiza Pina"
+date: "10 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objetos em R, criação e acesso aos valores
+
+---
+
+###  Vetores
+
+O objeto mais simples é o vetor, que contém uma sequência de valores ordenada, cada valor é chamado de _componente_ do vetor. Os valores podem ser numéricos, caracteres ou valores boolianos (lógicos), porém o **vetor aceita apenas um tipo de valor**.
+
+Vejamos como criar vetores e vemos a estrutura de um deles:
+
+
+```{r}
+a <- c(1, 2, 5, 3, 6, -2, 4) # criar vetor numérico
+b <- c("um", "dois", "três") # criar vetor com valores tipo carater ou texto 
+c <- c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE) # criar um vetor de valores booleanos
+
+str(b)
+```
+
+
+Vamos agora a acessar os valores armazenados de diferentes formas. Para o acesso usamos o parentesis reto "[]". 
+
+```{r}
+a[5]
+a[c(1, 4, 5)]
+b[3]
+c[3:6] 
+```
+
+
+---
+
+
+### Matrizes
+
+A matriz é uma coleção de elementos ordenada numa forma retangular bidimensional. Os dados têm de ser todos do mesmo tipo.
+Vamos criar uma matriz retangular numérica de 30 (5x6) elementos.
+
+---
+
+```{r}
+y <- matrix(1:30, nrow=5, ncol=6)  # criação dos valores
+y
+```
+
+
+Vejamos agora uma forma de criar e dar nomes nas linhas e colunas
+
+---
+
+```{r}
+valores    <- c(1,16,32,64,128,256) # vetor de valores
+l.nomes   <- c("L1", "L2", "L3")    # vetor de nomes das linhas
+c.nomes   <- c("C1", "C2")          # vetor de nomes das colunas
+# crio a matrix usando a função matrix, por padrão, ela preenche os campos por coluna
+matriz <- matrix(valores, nrow=3, ncol=2,
+                   dimnames=list(l.nomes, c.nomes)) 
+matriz
+
+# preenchimento da coluna por linha
+matriz2 <- matrix(valores, nrow=3, ncol=2, byrow=TRUE,
+                   dimnames=list(l.nomes, c.nomes))
+matriz2
+
+str(matriz) # estrutura da matriz
+
+```
+
+---
+
+O acesso aos valores também se dá usando o parêntesis reto "[]" mas agora levando em consideração que trabalhamos em duas dimensões. O primeiro valor corresponde às linhas e o segundo às colunas. Por exemplo [4,6], refere-se ao valor na quarta linha e sexta coluna. Vejamos mais exemplos: 
+
+
+```{r}
+x <- matrix(1:60, nrow=6)
+x
+x[3,]
+x[,1]
+x[1,4]
+x[2, c(4:8)]
+x[c(2:3), c(4:8)]
+
+```
+
+---
+
+### Dataframe
+
+O dataframe é usado para armazenar tabelas. É um conjunto de vetores de igual tamanho, porém podem ser de diferentes tipos de dados, sendo que cada vetor tem de ser do mesmo tipo. Vejamos o seguinte exemplo onde criamos um dataframe a partir de vetores numéricos, texto e lógicos.
+
+
+```{r}
+pessoas <- c("Silvia", "Pedro", "João", "Marcela", "Maria", "Elizabet")
+idades <- c(5, 44, 39, 20, 30, 66)
+parent <- c("Primo", "Irmão", "Irmão", "Primo", "Primo", "Tio")
+cidade <- c("Petropolis", "Rio", "Rio", "Friburgo", NA, "Rio")
+aposentado <- c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)
+
+familia<- data.frame(pessoas, idades, parent,cidade, aposentado)
+familia
+
+str(familia)
+
+summary(familia)
+```
+
+
+```{r}
+# Dataframe, acesso aos valores
+familia[3,3]
+familia[1:2]
+familia[c("parent","cidade")]
+familia$idade                       
+```
+
+---
+
+### Listas
+
+
+As listas são vetores genéricos que contém outros objetos, os quais podem ser de diferente tamanho e natureza, como vetores numéricos, texto, lógicos... A lista também pode conter matrizes, dataframe ou outras listas.
+Vejamos agora um exemplo em que os vetores são diferentes...
+
+
+```{r}
+d = c(2, 3, 5)   # vetor numérico de tamanho 3
+e = c("aa", "bbb", "ccd", "dde", "eef") # vetor carater de tamanho 5
+f = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE) # vetor lógico de tamanho 6
+# criação da lista, incorporando ainda um elemento numérico
+l = list(d, e, f, 333)  
+
+# estrutura da lista
+str(l)
+
+```
+
+---
+
+Para se referir a cada elemento ou vetor da lista usamos o parenteses reto "[]", se queremos acessar valores dentro do objeto, podemos usar um doble parenteses reto e depois um novo parêntesis para o elemento dentro dele..
+
+---
+
+```{r}
+w = list(a, matriz, familia)
+w  # lista criada com vetor, matriz e dataframe
+
+# acesso ao primeiro elemento
+w [1]
+
+# acesso as linhas 2 até 4, segunda coluna do terceiro elemento armazenado (dataframe familia) 
+
+w[[3]][2:4,2]
+```
+
+
+---
+
+```{r}
+# criando dados interativamente com o teclado
+meu.arq <- data.frame(idade=numeric(0),
+                     genero=character(0), 
+                     altura=numeric(0),
+                     peso=numeric(0))
+meu.arq <- edit(meu.arq)
+meu.arq
+
+```
+
+---
+
+FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "01_texto_all.Rdata")
+```

@@ -1,0 +1,417 @@
+---
+title: "Importação de arquivos de software estatístico"
+author: "Walter Humberto Subiza Pina"
+date: "13 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Importação de dados de outros pacotes estatisticos
+
+---
+
+Os arquivos de dados foram extraidos de:
+
+**SPSS Survival Manual**  (<http://spss.allenandunwin.com.s3-website-ap-southeast-2.amazonaws.com/data-files.html>)
+
+**The DHS Program**       (<http://dhsprogram.com/data/Download-Model-Datasets.cfm> (dados STATA e SAS))
+
+---
+
+Os pacotes a serem usados são: _**tidyverse::haven**_ e _**foreign**_.
+
+
+Arquivos de dados usados por _**haven**_:
+
+ vendas.sas7bdat (SAS)
+ 
+ trade.dta       (STATA)
+ 
+ personality.sav (SPSS)
+ 
+ person.sav      (SPSS)
+ 
+---
+ 
+
+Arquivos de dados usados por _**foreign**_:
+
+ florida.dta       (STATA)
+ 
+ edequality.dta    (STATA)
+ 
+ international.sav (SPSS)
+
+ arquivos rda
+ 
+load("nome_do_arquivo.RDA")
+
+
+---
+
+
+####1- Importar dados SAS com o pacote haven
+ 
+ _haven_ eh um pacote muito simples de usar, que importa dados dos pacotes estatísticos SAS, STATA e SPSS. 
+ 
+ Dependendo do pacotes, usara as funções:
+
+ **SAS: read_sas()**
+ 
+ **STATA: read_dta** (ou **read_stata()**, que são idênticos)
+ 
+ **SPSS: read_sav()** ou **read_por()**, depende do tipo de arquivo.
+
+---
+
+Todas as funções precisam de um argumento: o caminho do arquivo. Pode-se passar também uma URL, o _haven_ vai baixar primeiro o arquivo e depois vai importar ele.
+
+Vamos trabalhar com um arquivo SAS que contém informação de 36 pessoas, com detalhe da idade, sexo, salário e nível de compras (0 = low, 1 = high) (Fonte: SAS). 
+
+A informação está gravada no arquivo "vendas.sas7bdat", no seu diretório. 
+
+
+**Exercício 1**
+
+ Carregue o pacote haven;
+ 
+ Importe os dados do arquivo "vendas.sas7bdat" e salve como "vendas";
+ 
+ Verifique a estrutura com str();
+ 
+ Verifique que algumas colunas deveriam ser fatores (categóricas)
+
+---
+ 
+```{r, warning=FALSE}
+#Carregar o pacote haven
+library("haven")
+
+#Importar "vendas.sas7bdat" como "vendas""
+vendas<- read_sas("vendas.sas7bdat")
+
+#estrutura de vendas, faca o resumo do arquivo, veja o tipo de variaveis
+str(vendas)
+
+summary(vendas)
+```
+
+---
+
+Uma vez o arquivo importado, pode trabalhar ele normalmente no R
+
+Converta purchase, gender e income em fatores, faca o resumo novamente, veja as diferencas
+
+---
+
+```{r}
+vendas$purchase <- as.factor(vendas$purchase)
+
+vendas$gender <- as.factor(vendas$gender)
+
+vendas$income <- as.factor(vendas$income)
+
+summary(vendas)
+```
+
+
+---
+
+**Importar dados STATA com haven**
+
+os dados desse software são importados usando a função **read_dta()**.
+ 
+Analisando os dados importados por read_dta(), vai notar uma coluna importada como vetor de caráteres, quando na verdade são datas. 
+
+Para fazer essa coluna virar datas novamente, vamos converter ela usando a função **as_factor** primeiro para transformar de caráter a fator e logo a função **as.Date** para indicar que deverá ser tratada como datas. Verifique a diferença entre eles.
+
+Neste exercicio vamos trabalhar com dados anuais de importação e exportação de açucar em dólares e toneladas. Os dados sao de: 
+ <http://assets.datacamp.com/course/importing_data_into_r/trade.dta>
+
+---
+
+**Exercicio 2**
+
+Importar o arquivo "trade.dta" diretamente, guardar como "acucar". O arquivo também está no seu diretório de trabalho.
+
+---
+
+```{r}
+acucar <- read_dta("http://assets.datacamp.com/course/importing_data_into_r/trade.dta")
+
+# o arquivo no seu diretório pode ser lido com:
+#acucar <- read_dta("trade.dta")
+
+#  mudar os nomes das colunas para o português
+nomes.col <- c("Data","Importacao", "Peso_Im", "Exportação", "Peso_Ex")
+names(acucar) <- nomes.col
+
+# Imprimir a estrutura de acucar, note a coluna de data como carater
+str(acucar)
+
+```
+
+---
+
+Converter os caracteres da coluna Data em valores de datas usando  as.Date(as_factor(___)).
+
+---
+
+```{r}
+acucar$Data <- as.Date(as_factor(acucar$Data))
+
+#Imprimir a estrutura de acucar, note a coluna de data como datas agora
+str(acucar)
+summary(acucar)
+```
+
+---
+
+**Gráfico**
+
+Um gráfico pode ser útil para ver a relação entre variáveis nesse arquivo. Vamos lembrar como fazer um gráfico. O mais básico é passar dois argumentos na função _plot()_. Ela vai fazer o resto. Se quiser enfeites pode melhorar depois.
+ 
+Fazer um gráfico de Importação e Peso_Im
+
+```{r}
+plot(acucar$Data, acucar$Peso_Im, type = "b")
+```
+
+---
+
+**Importar dados SPSS** 
+
+Dependendo do tipo de arquivo SPSS que tenha de importar, pode precisar de _read_sav()_ para arquivos ".sav" files ou _read_por()_ para arquivos ".por"
+
+Nesse exercicio vamos usar o arquivo "Big Five personality traits" (Fonte: Universidade de Bath, Reino Unido). O arquivo tem informacoes sobre 434 pessoas no campo da psicologia (5 dimensoes da personalidade)
+
+---
+
+
+**Exercicio 3**
+
+Use read_sav() para importar o arquivo "personality.sav". 
+
+Salve o arquivo como "personalidades". Veja com summary se tem NA e quantos são por variável.
+
+---
+
+```{r}
+library("haven")
+personalidades <- read_sav("personality.sav")
+
+summary(personalidades)
+
+names(personalidades)
+```
+
+---
+
+Com o arquivo personalidades, preparado a partir de personality:
+
+Separe um subconjunto de individuos que tenham os mais altos índices em Originalidade e Prestatividade (por exemplo mais de 4 pontos em ambas). Use _subset()_, mas primeiro vamos preservar a ordem das pessoas usando uma sequência.
+
+---
+
+```{r}
+num <- seq(1:459)
+personalidades2 <- cbind(num, personalidades)
+
+# subset
+grupo1 <- subset(personalidades2,  PERS05 >= 4 & PERS07 > 4 , select = c(num,PERS05,PERS07))
+```
+
+
+---
+
+####Importar dados STATA com foreign (parte 1)
+ 
+ O pacote tem uma função simples para importar: read.dta().
+ 
+Vamos importar dados da eleição presidencial nos USA no ano 2000.
+
+O arquivo florida.dta contem dados dos 4 principais candidatos, assim como o total de votantes no estado da Florida (Fonte: Florida Department of State).
+ 
+**Exercício 4**
+
+Carregue a biblioteca foreign. Importe o arquivo "florida.dta", e salve como florida. Use read.dta() sem argumentos e verifique os últimos 10 registros
+
+---
+
+```{r}
+library("foreign")
+
+# importar os dados
+florida <- read.dta("florida.dta")
+
+# verificar os últimos 10 registros
+tail(florida, 10)
+```
+
+
+---
+
+
+####Importar dados STATA com foreign (parte 2)
+
+Os dados importados podem ser de diversas categorias, como caracteres, categóricos, datas, etc. Nesses casos os argumentos de read.dta() podem ajudar, consulte a documentação por mais ajuda.
+
+Os argumentos mais comuns são:
+ - convert.dates, 
+ - convert.factors, 
+ - missing.type, e 
+ - convert.underscore.
+ 
+ O significado e evidente
+
+O arquivo para esse exercício contém dados socioeconômicos e acesso a educação para diferentes indivíduos (fonte:World Bank). O arquivo é edequality.dta, localizado no seu diretório
+
+ 
+**Exercício 5**
+
+Carregar el arquivo "edequality.dta" de diversas formas, verifique a estrutura apos cada uma:
+
+ 1- edu_equal_1:  read.dta() sem argumentos.
+ 
+ 2- edu_equal_2:  read.dta() e o argumento convert.factors to FALSE.
+ 
+ 3- edu_equal_3:  read.dta() e o argumento convert.underscore to TRUE.
+ 
+---
+
+```{r}
+# Criar edu_equal_1 e verificar a estrutura
+edu_equal_1 <- read.dta("edequality.dta")
+str(edu_equal_1)
+
+#Criar edu_equal_2 e verificar a estrutura
+edu_equal_2 <- read.dta("edequality.dta" , convert.factors= FALSE)
+str(edu_equal_2)
+
+#Criar edu_equal_3 e verificar a estrutura
+edu_equal_3 <- read.dta("edequality.dta" , convert.underscore = TRUE)
+str(edu_equal_3)
+
+```
+ 
+---
+
+Ao verificar as diferenças se acha que possivelmente a primeira versão seja a melhor para trabalhar. Vejamos no proximo exercício se a data se entende.
+
+---
+
+**Exercício 6**
+
+ Trabalhe com o primeiro conjunto de dados **edu_equal_1**. Separe um subconjunto que tenha pessoas com mais de 40 anos e saibam ler. Uma rápida verificação com **str** nos informa que _age_ (idade) é um número inteiro e _literate_ (alfabetizado), é fator com dois niveis,"yes" e "no". O parametro nrow conta o número de linhas do subconjunto.
+
+---
+ 
+```{r}
+str(edu_equal_1)
+#
+nrow(subset(edu_equal_1, age > 40 & literate == "yes"))
+```
+
+---
+
+Outra pesquisa, quantas pessoas em Roma tem ingressos maiores a 1000?
+
+---
+
+```{r}
+nrow(subset(edu_equal_1, ethnicity_head  == "Roma" & income > 1000))
+```
+
+ Respostas possíveis:
+ 
+ 9457
+ 
+ 539
+ 
+ 8997
+ 
+ 10840
+
+--- 
+
+####Importar dados SPSS com foreign (1)
+
+Para importar SPSS, o pacote vem com a funcao read.spss(). Se quizer importar os dados como dataframe, coloque  _to.data.frame = TRUE_ dentro de read.spss().
+
+Nesse exercicio vamos trabalhar algumas variaveis socio-economicas de diferentes paises(fonte: Quantative Data Analysis in Education). O arquivo SPSS é o **international.sav**.
+
+**Exercicio 7**
+
+Importar o aquivo "international.sav" convertir a data frame. Salvar o data frame como _inter_.  Criar um boxplot da variável gdp.
+
+---
+ 
+```{r}
+ inter <- read.spss("international.sav", to.data.frame = TRUE)
+
+#Crear um boxplot da variavel gdp
+boxplot(inter$gdp, horizontal = T)
+```
+
+---
+
+Extensão: Correlação
+
+Lembram da correlação de Pearson? É uma medida que avalia a dependência linear entre 2 variáveis e vá de -1 a 1.
+
+Quando existe a correlação entre duas variáveis, elas possivelmente (!!!) podem ser dependentes. A correlação é calculada com a função cor().
+
+ Usando os dados do dataframe inter, qual a correlacao entre **gdp** e **f_illit** (analfabetizmo feminino), faça uma plotagem?
+
+---
+
+```{r}
+cor(inter$gdp,inter$f_illit)
+
+plot(inter$gdp,inter$f_illit)
+```
+
+---
+
+####Importar dados SPSS com foreign (parte 2)
+
+Nesse exercício se usará outro argumento para importar: **use.value.labels**. Ele especifica se as variáveis com caracteres deverão ser convertidas em fatores ou não. O valor padrão e TRUE.
+
+**Exercício 8**
+
+Imprimir as primeiras linhas de **inter**. Importe agora o mesmo arquivo "international.sav" como data frame, mais especificando **use.value.labels = FALSE**. Salve como inter2 e imprima as primeiras linhas.
+
+---
+
+```{r}
+#Imprima as primeiras linhas de inter
+head(inter)
+
+# Importe international.sav como inter2
+inter2 <- read.spss("international.sav",use.value.labels = FALSE,to.data.frame = TRUE)
+
+# imprima as primeiras linhas
+head(inter2)
+```
+
+---
+
+####FIM DE IMPORTAÇÃO DE DADOS DE PACOTES ESTATÍSTICOS
+
+---
+
+---
+
+FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "03_stats_all.Rdata")
+```
+
+

@@ -1,0 +1,572 @@
+---
+title: "Importando Planilhas"
+author: "Walter Humberto Subiza Pina"
+date: "13 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+
+## Importação de dados tipo Excel ou planilha
+
+---
+
+####Arquivos de dados usados por _readxl_:
+
+1- imagens.xlsx
+
+2- imagens_4.xlsx
+
+3- imagens_semcab.xlsx
+
+
+####Arquivos de dados usados por _gdata_:
+
+4- urbanpop.xls
+
+####Arquivos de dados usados por _XLConnect_:
+
+5- latitude.xlsx
+
+---
+
+####DICA:  SE PUDER TRANSFORME A PLANILHA EXCEL EM ARQUIVO TEXTO .CSV...
+####SE TIVER UMA PLANILHA CALC, TRANSFORME EM .CSV OU XLS...
+
+---
+
+**Pacote readxl**
+
+O pacote **readxl** é parte do superpacote **tidyverse**, mas ele não é carregado automáticamente com **tidyverse** e deve ser carregado em separado  usando: _library(readxl)_.
+
+Listar as planilhas que um arquivo excel pode conter
+
+Previo a importação de arquivos Excel, devemos conhecer quantas planilhas ele contém e saber quais delas são de nosso interesse. Para isso usamos a função **excel_sheets()**.
+
+Com dir() podemos ver os arquivos que temos no diretório de trabalho
+
+Deve aparecer um arquivo "imagens.xlsx". Consulte as planilhas que contém.
+
+```{r}
+dir()
+```
+
+
+---
+
+ 
+**Exercicio 1**
+
+Carregar o pacote readxl. 
+
+Veja as planilhas que contem o arquivo "imagens.xlsx", usando **excel_sheets()** e salve o resultado numa variavel "planilhas".
+
+```{r,  warning = FALSE}
+library(readxl)
+
+# consulte as planilhas, guarde e imprima o resultado
+planilhas = excel_sheets("imagens.xlsx")
+planilhas
+```
+
+
+Importar uma planilha
+
+Agora que sabe os nomes das planilhas, vamos importar uma delas. A importação é feita com a função **read_excel()**. 
+
+Veja a seguinte dica, estude ela e o que faz, é simples...
+
+**dados <- read_excel("arq.xlsx", sheet = "planilha_1")**
+
+
+A função simplemente importa a planilha "planilha_1" do arquivo "arq.xlsx". Também pode ser chamada a planilha pela posição no arquivo, por exemplo; **sheet=1**, importa a primeira planilha.
+
+---
+
+**Exercicio 2**
+
+Importar a primeira planilha de "imagens.xlsx" e guardar como "plan1".
+
+---
+
+```{r}
+plan1 <- read_excel("imagens.xlsx", sheet = 1)
+```
+
+---
+
+Importar a segunda planilha pelo nome
+
+---
+
+```{r, warning=FALSE}
+plan2 <- read_excel("imagens.xlsx", sheet = "fuso 24")
+```
+
+---
+
+As planilhas importadas são do tipo tabela e dataframe, confira:
+
+```{r}
+class(plan1)
+```
+
+---
+
+Como ambas tem tamanhos diferentes, o melhor objeto em R para armazenar-las juntas é a lista.
+
+---
+
+**Exercicio 3**
+
+Junte ambas planilhas "plan1" e "plan2" numa lista chamada "fusos". Verifique a estrutura
+
+---
+
+```{r}
+fusos = list("plan2"= plan2,"plan1" = plan1) # criando com nomes
+str(fusos) # estrutura
+names(fusos) # nomes
+
+#fusos["plan1"] # chamado dentro da lista
+#fusos[2]
+```
+
+---
+
+Leitura de varias planilhas em forma automática e armazenar como uma lista única.
+
+Em vez de importar as planilhas de a uma, pode ser feita a importação em forma automática com a funcao _lapply()_ do pacote base. 
+
+Se recomenda dar uma olhada na documentacao da funcao ??lapply
+
+Exemplo de codigo genérico a ser usado:
+
+     minha_lista_excel <- lapply(excel_sheets("arq.xlsx"), 
+                                                    read_excel, 
+                                                    path = "arq.xlsx")
+
+
+Assim a funcao **read_excel()** é chamada várias vezes no mesmo arquivo, e cada planilha importada uma apois da outra
+
+O resultado é uma lista de dataframes, cada um de uma planilha diferente
+
+---
+
+
+**Exercicio 4**
+
+Usar _lapply_ para importar as planilhas do arquivo "imagens_4.xlsx", colocar nomes nas planilhas e verificar a estrutura do arquivo final.
+
+---
+
+```{r,  warning = FALSE}
+plan_list <- lapply(excel_sheets("imagens_4.xlsx"), 
+                   read_excel, 
+                   path = "imagens_4.xlsx")
+
+# colocar nomes nas planilhas
+nomes.plan <- excel_sheets("imagens_4.xlsx") # que nomes??
+
+names(plan_list) <- nomes.plan               # coloca nomes
+
+str(plan_list)                               # verifica estrutra
+```
+
+---
+
+####Nomes das colunas
+
+Além dos parâmetros ja trabalhados, temos outros argumentos que podemos definir, se necessário. Um deles é **col_names**.
+
+Por padrão, **col_names = TRUE**, indicando que temos no cabeçalho do arquivo os nomes das colunas. De não ser assim e tiver uma planilha sem nomes, o R vai escolher nomes, mas também pode-se indicar em *col_names* um vetor que contenha os nomes que desejar para cada coluna, igual a _readr_ em arquivos texto. 
+
+---
+
+
+**Exercicio 5**
+
+Importar do arquivo "imagens_semcab.xlsx", a primeira planilha, duas vezes. Na primeira indica *col_names = FALSE* e deixe o R escolher nomes (plan3);
+
+Na segunda, indique um vetor com os nomes das colunas (plan4), compare com _summary_.
+
+---
+
+```{r}
+plan3 <- read_excel("imagens_semcab.xlsx", sheet = 1,col_names = FALSE)
+
+(nomes.col <- c(names(plan1))) # pego os nomes e guardo
+
+plan4 <- read_excel("imagens_semcab.xlsx", sheet = 1,col_names = nomes.col)
+
+summary(plan3)
+
+summary(plan4)
+```
+
+---
+
+Outro argumento que pode ser útil na importação é _skip_. Com ele pode-se ignorar uma quantidade de linhas determinadas. Como sempre não esquecer que podemos perder o cabecalho se ele estiver nessas linhas.
+
+---
+
+**Exercicio 6**
+
+Importar a segunda planilha de "imagens.xlsx" mas ignorando as primeiras 20 linhas; não esqueça de colocar col_names = FALSE, senão ele vai ler a primeira linha válida como cabeçalho. Guarde como plan5 e imprima a primeira linha do novo arquivo.
+
+---
+
+```{r,  warning = FALSE}
+plan5 <- read_excel("imagens.xlsx", sheet = 2,col_names = FALSE, skip = 20)
+plan5[1,]
+```
+
+---
+
+E gravar??? 
+
+---
+
+####DICA:  SE PUDER, SALVE EM ARQUIVO TEXTO .CSV E IMPORTE EM PLANILHA EXCEL OU CALC...senão
+
+---
+
+####consulte a função write.xlsx do pacote openxlsx **(openxlsx::write.xlsx)**
+
+---
+
+
+Use o pacote WriteXLS (consulte a documentacao, grava tanto arquivos **xls** como **xlsx**)
+
+Sintaxe do comando e valores padrao dos argumentos:
+   
+   
+            WriteXLS(x, ExcelFileName = "R.xls", SheetNames = NULL, perl = "perl",
+   
+              verbose = FALSE, Encoding = c("UTF-8", "latin1"),
+            
+                row.names = FALSE, col.names = TRUE,
+            
+                  AdjWidth = FALSE, AutoFilter = FALSE, BoldHeaderRow = FALSE,
+            
+                    FreezeRow = 0, FreezeCol = 0,
+            
+                      envir = parent.frame())
+
+---
+
+ 
+ Se AdjWidth = TRUE, ajusta a largura de cada coluna pelo valor mais comprido.
+ 
+ Se AutoFilter = TRUE, a planilha xlx ja sai com autofiltro
+
+ Se BoldHeaderRow = TRUE, nome de cada coluna em negrito
+ 
+ Os comandos FreezeRow e Freezecol indicam quais colunas devem sair congeladas.
+
+---
+
+**Pacote GDATA**
+```{r,message=FALSE}
+library (gdata)
+```
+
+Importar um arquivo local
+
+ A importação é muito semelhante ao pacote anterior o comando é read.xls e pode-se determinar qual planilha importar (sheet= ..)
+
+**Cuidado**: Apenas trabalha com arquivos xls, nao xlsx!!! (versão 97-2003)
+
+O arquivo a importar é "urbanpop.xls" (fonte: Gapminder) e contém três planilhas com dados de população de todos os países em três periodos diferentes. Em cada planilha existe um cabeçalho com os nomes das colunas.
+
+---
+
+**Exercicio 7**
+
+Carregar o pacote, (Perl deve estar instalado previamente), importe a segunda planilha chamada "1967-1974", guarde como urban_pop.
+
+Imprima com head as primeiras 11 linhas do arquivo importado
+
+
+O primeiro comando é para saber se tem o perl instalado, se o tem, o caminho será usado depois na importação.
+
+---
+
+
+```{r,message=FALSE}
+perl.cam <- gdata:::findPerl("perl")# , pode usar depois perl.cam 
+urban_pop = read.xls("urbanpop.xls", sheet="1967-1974", perl=perl.cam)
+
+# Imprimir as primeiras 11 observacoes usando head()
+head(urban_pop, n=11)
+names(urban_pop)
+```
+
+---
+
+**read.xls() trabalha como read.table()**
+
+Read.xls() trabalha da seguinte forma: primeiro converte o arquivo excel num arquivo csv usando um script na linguagem Perl, depois simplesmente lê o arquivo com a função read.csv(), a qual é carregada automáticamente em R com o pacote _utils_.
+
+Assim sendo, todas as operacoes que fazemos com _read.csv()_ tambem podem ser feitas com _read.xls()_.
+ 
+O arquivo "urbanpop.xls" tem três planilhas cada uma com os nomes das colunas na primeira linha
+
+---
+
+** Exercicio 8**
+
+1- Os nomes das colunas da planilha a importar ja estao configurados na variavel "colunas", veja o comando e entenda o que faz.
+
+2- Finalizar o comando read.xls() que lê os dados da segunda planilha de "urbanpop.xls". Ignore as primeiras 20 linhas.
+
+Coloque  o cabecalho adequado (header, T ou F) e veja que as colunas com nomes nao sejam importadas como fatores (stringsAsFactors, T ou F)
+
+Salve o arquivo como" "urban_pop2", imprima as primeiras 15 observacoes.
+
+---
+
+**nomes das colunas**
+
+```{r,message=FALSE}
+(colunas <- c("Pais", paste0("Ano_", 1967:1974)))
+```
+
+---
+
+Finalizar o comando read.xls
+
+urban_pop2 <- read.xls(arq, sheet = , 
+                       skip = , header = , stringsAsFactors = ,
+                       col.names = )
+
+Solução:
+
+---
+
+```{r,message=FALSE}
+urban_pop2 <- read.xls("urbanpop.xls", sheet = 2, 
+                       skip = 20, header = FALSE, stringsAsFactors = FALSE,
+                       col.names = colunas)
+
+head(urban_pop2, 15)
+```
+
+
+Chegou ate Burkina Faso?
+
+---
+
+
+Agora que importamos dados de planilhas excel, vamos a fazer um pouco  de limpeza e organização. Para isso podemos usar o comando _cbind_.
+
+Esse comando junta arquivos por colunas, ou seja coloca os arquivos um do lado do outro, adicionado colunas. O comando rbind, faz o mesmo mas junta os arquivos adicionando linhas.
+
+Volvemos ao arquivo "urbanpop.xls", ele tem três planilhas com os nomes das colunas na primeira linha, como já vimos.
+
+Vamos ler as três planilhas, juntar elas com cbind e limpar o arquivo final de valores faltantes (NA).
+
+**Exercicio 9**
+
+Finalizar o código para ler os dados da segunda e terceira planilha de "urbanpop.xls". Serão importados três data frames:
+**urban_plan1,  urban_plan2 e  urban_plan3**.
+
+No código de juntar os dataframes, elimine a primeira coluna do segundo e terceiro dataframe, isso para não repetir essa coluna
+
+Salve o resultado como "urban" e faca o resumo
+
+Use _na.omit()_ para limpar o arquivo de valores NA, salve como "urban_limpo"
+
+**código a completar**:
+
+---
+
+#### caminho
+
+path <- "urbanpop.xls"
+
+####  leitura
+urban_plan1 <- read.xls(path, sheet =  , stringsAsFactors =  )
+
+urban_plan2 <- read.xls(path, sheet =  , stringsAsFactors =  )
+
+urban_plan3 <- read.xls(path, sheet =  , stringsAsFactors =  )
+
+####  junte as tres planilhas
+urban <- cbind (   ))
+
+####  Limpeza de urban: urban_limpo
+urban_limpo <- 
+
+####  impressão do resumo
+summary( )
+
+---
+
+Solução:
+
+```{r,message=FALSE}
+# caminho
+path <- "urbanpop.xls"
+
+colunas <- c("Pais", paste0("Ano_", 1960:2011))
+
+# leitura
+urban_plan1 <- read.xls(path, sheet = 1, stringsAsFactors = FALSE)
+urban_plan2 <- read.xls(path, sheet = 2, stringsAsFactors = FALSE)
+urban_plan3 <- read.xls(path, sheet = 3, stringsAsFactors = FALSE)
+
+# junte as tres planilhas
+urban <- cbind(urban_plan1, urban_plan2[-1], urban_plan3[-1])
+
+names(urban) <- colunas
+
+# Limpeza de urban: urban_limpo
+urban_limpo <- na.omit(urban)
+
+# impressão do resumo
+summary(urban_limpo)
+```
+
+---
+
+Quantos registros foram eliminados??
+
+---
+
+**O pacote XLConnect**
+
+O primeiro paso usando esse pacote é a criação de uma ponte, conexão ou vínculo entre sua sessão R e o arquivo excel. Isto se faz com a função _loadWorkbook()_.
+
+Vamos trabalhar com o arquivo latitude.xlsx, que contem as latitudes de diferentes países (fonte: Gapminder).
+
+**Exercício 10**
+
+Carregue o pacote XLConnect;
+
+Crie a conexão com "latitude.xlsx", usando loadWorkbook();
+
+Carregue o arquivo e salve como meu.arq;
+
+Verifique a classe do arquivo carregado, qual é?
+
+---
+
+```{r, warning=FALSE}
+#  XLConnect
+library("XLConnect")
+
+# Criar a conexao latitude.xlsx: meu_arq
+meu.arq <- loadWorkbook("latitude.xlsx")
+
+# Classe do arquivo importado?
+class(meu.arq)
+```
+
+---
+
+Semelhante a _readxl_ e _gdata_, vc pode usar _XLConnect_ para importar arquivos excel. Para listar as planilhas use _getSheets()_ e logo _readWorksheet()_. Ambos requerem que se tenha um objeto criado por _XLConnect_ como primeiro argumento.
+
+**Exercicio 11**
+
+Carregar o arquivo "latitude.xlsx", verificar as planilhas que contem com _getSheets()_, importar a segunda planilha ("1900")
+
+```{r, warning=FALSE}
+meu.arq2 <- loadWorkbook("latitude.xlsx")
+
+# Listar as planilhas que contem
+getSheets(meu.arq2)
+
+# Importar a segunda planilha
+plan2 <- readWorksheet(meu.arq2, 2)
+
+plan3 <- readWorksheet(meu.arq2, "1900") # nome funciona tambem
+
+head(plan2)
+
+head(plan3)
+```
+
+
+**Criar planilhas excel**
+
+Enquanto  _readxl_ e _gdata_ apenas importan os dados, _XLConnect_ vai além e permite editar e modificar os arquivos desde R
+
+
+---
+
+
+**Exercicio extra a ser feito fora da aula...**
+
+Criar uma nova planilha, colocar alguns dados nela e salvar como arquivo excel. 
+
+Continuamos com "latitude.xlsx".
+
+A nova planilha é criada com createSheet(), chame de "resumo_dados"
+
+Use writeWorksheet() para gravar o resumo dos dados em "resumo_dados"
+
+Use saveWorkbook() para gravar o novo arquivo excel como "latitude_com_resumo.xlsx".
+
+---
+
+**Solução:**
+
+_Conexao a latitude.xlsx:_
+
+library(XLConnect)
+
+meu.arq3 <- loadWorkbook("latitude.xlsx")
+
+---
+
+_criar o data frame: resumo_
+
+dados1 <- dim(readWorksheet(meu.arq3, 1))
+
+dados2 <- dim(readWorksheet(meu.arq3, 2))
+
+resumo <- data.frame(sheets = getSheets(meu.arq3), 
+
+                     nrows = c(dados1[1], dados2[1]), 
+                     
+                     ncols = c(dados1[2], dados2[2]))
+
+---
+
+_criar a planilha no arquivo excel:_
+
+createSheet(meu.arq3 ,name="resumo_dados")
+
+---
+
+_colocar os dados calculados:_
+
+writeWorksheet(meu.arq3, resumo, sheet= "resumo_dados")
+
+---
+
+_Salvar o novo arquivo excel:_
+
+saveWorkbook(meu.arq3, file="latitude_com_resumo.xlsx")
+
+
+---
+
+####FIM DO SCRIPT IMPORTAÇÃO DE DADOS TIPO PLANILHA####
+
+---
+
+FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "Oficina_AED_02.Rdata")
+```
+

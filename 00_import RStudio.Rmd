@@ -1,0 +1,184 @@
+---
+title: "Análise Exploratório de Dados com R - Parte I"
+author: "Walter Humberto Subiza Pina"
+date: "9 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Importando arquivos com a nova versão 1 do RStudio
+
+A partir da versão 1.0 do RStudio, as funções de importação de dados texto, planilhas e dados de estatística, foram incorporadas como um adicional no _"Import Dataset"_, já existente na janela 2 (janela de ambiente, histórico e arquivos). 
+
+As novas opções implementam o pacote tidyverse, nas funções readr(como read_table, read_csv, etc), readxl e haven.
+veja RStudio Blog - tidyverse 1.0.0 em <https://blog.rstudio.org/2016/09/15/tidyverse-1-0-0/>
+
+---
+
+####1- Arquivos texto ou ascii
+
+
+
+Começando pelos arquivos texto, já sejam eles com extensão ".txt" ou ".csv".
+
+Vamos importar o arquivo _airquality.txt_, que está no nosso diretório de trabalho. A janela que se abre deve ser a seguinte:
+
+---
+
+
+![Janela de importação do RStudio que aparece ao clicar em "Import Dataset"](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar00.JPG)
+
+---
+ 
+Nesta janela salientamos em vermelho o seguinte:
+
+1- o caminho do nosso arquivo a importar, que pode ser mudado com o botão "browse" à direita.
+
+2- uma pre-visualização dos dados onde podemos conferir como o nosso arquivo será importado. Note-se que reconhece automáticamente que a primeira linha tem os nomes das variáveis e que os dados estão agrupados sem um reconhecimento do separador de variáveis.
+
+3- Opções de importação, aqui podemos personalizar nossa importação, podemos começar a leitura numa linha determinada com a opção "skip" por exemplo, ou determinar qual realmente é o delimitador de variáveis correto, também podemos determinar qual o simbolo usado para separar números decimais ("Locale")
+
+4- Finalmente todas as nossas opções aparecem codificadas na última janela, podemos também inserir outras modificações aqui.
+
+Nesse exemplo, a leitura do arquivo foi feita com delimitador padrão vírgula **","**, mas não está correto, mudamos essa opção para espaço em branco ("whitespace")  e vemos a mudança que deve ser a seguinte:
+
+---
+
+![Janela de importação do RStudio depois da mudança de separador para espaço em branco " ".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar01.JPG)
+
+---
+
+Sempre devemos conhecer o formato do arquivo que importamos, principalmente:
+
+1. os dados tem cabeçalho? ou só observações?
+
+2. qual o separador de campos ou colunas?
+
+3. qual o separador decimal?
+
+4. existem colunas de texto ou numéricas a serem tratadas como fatores? Se sim, quais os diferentes níveis?
+
+5. existem valores faltantes? NAs?
+
+
+---
+
+Uma opção interessante da importação nessa janela, é a possibilidade de determinar o tipo de variável que estamos importando ou ainda eliminar alguma coluna não desejada, por exemplo vamos importar o arquivo "demo3.csv". 
+
+Nesse arquivo desejamos eliminar na coluna 1 na importação e vamos determinar que as variáveis "Bloco" e "Sub.Bloco" são fatores. Para fazer isso nesse momento, devemos conhecer quais os níveis de cada uma. A variável "Bloco", tem os níveis "1" e "2", já a variavel "Sub.Bloco", tem os níveis, "01A", "01B", "01C" e "2".
+
+Na importação temos de fazer os seguintes passos:
+
+1- estabelecer o delimitador de variáveis como ponto e virgula **";"** (separator);
+
+2- estabelecer o delimitador numérico como virgula, **","** (locale ou sep = "," no código);
+
+3- eliminar a coluna 1 para a importação (skip column), clicando no cabeçalho da variável e escolhendo a opção adequada;
+
+4- definir "Bloco" e "Sub.Bloco" com fatores com seus respectivos níveis;
+
+5- o código de importação final fica como:
+
+---
+
+```{r warning = FALSE}
+library(readr)
+demo03 <- read_delim("~/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/01 texto/demo03.csv", 
+     ";", 
+     escape_double = FALSE, 
+     col_types = cols(Bloco    = col_factor(levels = c("1", "2")), 
+                     Sub.Bloco = col_factor(levels = c("01A", "01B", "01C", "2")), 
+     X1 = col_skip()), 
+     locale = locale(decimal_mark = ","), 
+     trim_ws = TRUE)                     # trim whitespace, remove leading or trailing ws from characters
+```
+
+---
+
+![Janela de importação do RStudio na importação de "demo03.csv".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar02.JPG)
+
+---
+
+Nem sempre a importação através de "Import Dataset" da certo. Por isso devemos conhecer outras formas de importação como as já vistas através da função _read.table_ e derivadas do pacote base *utils* . 
+
+A mencionada função é carregada automaticamente quando o R é iniciado e lê qualquer arquivo em forma de tabela e carrega como um dataframe, possuindo um grande número de argumentos que permitem controlar a importação.
+
+Como padrão, a função assume que o arquivo não tem cabeçalho, o separador de campos é espaço e o separador decimal é “.”. Outras opções podem ser consultadas com ?read.table.
+
+No caso do seguinte exemplo do arquivo separado por vários espaços em branco "old_faith.txt", vamos importar pela janela 2 e com a função read.table.
+
+A importação com a janela 2, não reconhece os vários campos em branco entre colunas e termina importando como uma variável só.
+
+Já a função _read.table_, apenas especificando que o arquivo tem cabeçalho...
+
+---
+
+```{r}
+old <- read.table("old_faith.txt", header = T)
+```
+
+
+
+**Exercício**
+
+Importar arquivo "airquality.txt" com "Import Dataset" e com read.table. Salve com nomes diferentes e imprima os 6 primeiros registros e os 3 últimos de cada um. Consulte as opções de read.table.
+
+Porquê acha que nesse exemplo a importação foi feita corretamente? qual a diferença de formato entre os arquivos "old_faith.txt" e "airquality.txt"?
+
+---
+
+####2- Arquivos planilhas Excel
+
+Também é possível importar arquivos Excel a partir da opção "Import Dataset". Vamos importar os arquivos "imagens.xlxs" e "imagens_semcab.xlxs".
+
+No caso do primeiro arquivo, vemos que o cabeçalho foi automaticamente reconhecido, assim como os tipos de variáveis (destaque vermelho 1). 
+
+Nas opções de importação (destaque 2), podemos selecionar qual planilha ou tabela do arquivo importar, por padrão importa a primeira, mas podemos selecionar ou adicionar, "sheet = número ou nome" no código para importar uma outra tabela diferente.
+
+---
+
+![Janela de importação do RStudio na importação de "imagens.xlxs".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar03.JPG)
+
+---
+
+Já na importação de "imagens_semcab.xlxs", o arquivo carece de cabeçalho sendo necessário especificar a opção. Os nomes das variáveis serão automáticamente asignados a "X__0", "X__1", ...etc, veja a captura de tela seguinte:
+
+---
+
+![Janela de importação do RStudio na importação de "imagens_semcab.xlxs".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar04.JPG)
+
+---
+
+Exercício: importe o arquivo "urbanpop.xls", tabela "1975-2011"
+
+---
+
+####3- Arquivos de pacotes estatísticos
+
+A importação de arquivos provenientes de pacotes estatísticos é facilitada pela opção "Import Dataset". Práticamente todos os formatos são suportados, como
+SAS, SAV, rda e dta. 
+
+Exercício:
+
+Vamos proceder a importação dos seguintes arquivos do diretório 01 Importação\03 estats:
+
+1- "vendas.sas7bdat" -  (SAS)
+
+2- "trade.dta" - (STATA)
+
+3- "international.sav" (SPSS)
+
+---
+
+####  FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+
+save(list = ls(), file = "Oficina_AED_00.Rdata") 
+```

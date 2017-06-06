@@ -1,0 +1,124 @@
+---
+title: "Análise Exploratório de Dados com R - Parte I"
+author: "Walter Humberto Subiza Pina"
+date: "9 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Importando arquivos tipo texto
+
+---
+
+A forma mais simples para a importação de arquivos tipo texto (ASCII), é através da função _read.table_ e derivadas do pacote base *utils* . 
+
+A mencionada função é carregada automaticamente quando o R é iniciado e lê qualquer arquivo em forma de table e carrega como um _dataframe_, possuindo um grande número de argumentos que permitem controlar a importação.  
+
+Como padrão, a função assume que o arquivo não tem cabeçalho, o separador de campos é espaço e o separador decimal é ".". 
+Outras opções podem ser consultadas com ?read.table.
+
+Vamos importar um arquivo texto, que pertence ao conjunto de dados de teste do R (consulte ?datasets), após a importação responda porque foi detectado o cabeçalho do arquivo?
+
+
+```{r}
+air <- read.table("airquality.txt")
+```
+
+
+em caso de o arquivo não estiver no diretório de trabalho podemos fazer a leitura da seguinte forma:
+
+
+```{r}
+dir <- file.path ("~/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/01 texto","airquality2.txt" )
+dir
+#read.table(dir) # o comando da erro por causa do formato do arquivo
+air2 <- read.table(dir,
+           header=T,
+           sep=",")
+```
+
+---
+
+Sempre devemos conhecer o formato do arquivo que importamos, principalmente:
+
+1. tem cabeçalho? ou só observações?
+
+2. qual o separador de campos ou colunas?
+
+3. qual o separador decimal?
+
+4. existem colunas de texto ou numéricas a serem tratadas como fatores?
+
+5. existem valores faltantes? NAs?
+
+Para não ter de especificar sempre os mesmos parâmetros, surgiram algumas funções derivadas de _read.table_, elas são:
+
+---
+
+
+| função      | header |  sep | dec |  StringAsFactors  | 
+|-------------|-------|------|---|-----------------|
+| read.csv    |T      |,     | . | F               |
+| read.delim  |T      |TAB   |.  | F               |
+| **read.csv2**   |T      | ;    |,  | F               |
+| **read.delim2** |T      |TAB   |,  | F               |
+
+
+---
+
+### Outros pacotes a explorar
+
+_readr_
+Criado por Hadley Wickman (RStudio), é um pacote rápido, consistente e de fácil uso. 
+Ele deve ser carregado como pacote primeiro (install.packages +library).
+Veja ?readr. Esse pacote foi inserido há pouco tempo na coleção de pacotes _tidyverse_, que veremos com mais detalhe quando da preparação e limpeza de dados.
+
+A função principal é _read_delim_, com funções derivadas _read_csv_ e _read_tsv_.
+
+---
+
+
+```{r warning=FALSE}
+library(readr)
+read_tsv("old_faith.txt")
+
+```
+
+---
+
+Um outro pacote interessante para importação de dados texto é _data.table_.
+Criado por Matt Dowle & Arun Srinivasan, é muito rápido usando a função _fread()_ para importar, ele deve como o anterior, ser carregado primeiro. Ele tenta determinar o tipo de colunas e separadores usados.
+
+---
+
+
+```{r}
+library(data.table)
+fread("old_faith.txt")
+
+```
+
+---
+
+**Exercício**
+
+1- Importar arquivo tabela01 com _read.table_ e _readr_. Salve com nomes diferentes e imprima os 6 primeiros registros e os 3 últimos de cada um.
+
+2-  Importar "demo03.csv" usando o leitor adequado de read.table, imprima em tela os primeiros 15 registros. 
+ Investigue os dados importados e faça um sumário
+
+---
+
+ 
+####  FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+
+save(list = ls(), file = "Oficina_AED_01.Rdata") 
+```
