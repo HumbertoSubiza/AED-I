@@ -102,7 +102,7 @@ O dataframe é usado para armazenar tabelas. É um conjunto de vetores de igual 
 
 ```{r}
 pessoas <- c("Silvia", "Pedro", "João", "Marcela", "Maria", "Elizabet")
-idades <- c(5, 44, 39, 20, 30, 66)
+idades <- c(5, 44, 39, 20, 30, NA)
 parent <- c("Primo", "Irmão", "Irmão", "Primo", "Primo", "Tio")
 cidade <- c("Petropolis", "Rio", "Rio", "Friburgo", NA, "Rio")
 aposentado <- c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)

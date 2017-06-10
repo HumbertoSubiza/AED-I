@@ -1,0 +1,409 @@
+---
+title:  "Oficina AED"
+author: "Walter Humberto Subiza Pina"
+date: "21 de fevereiro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução ao Análise Exploratório de Dados
+
+---
+
+####3- Preparando os dados com **tidyverse::dplyr**
+
+---
+
+
+Em esse exercício vamos analisar algumas ferramentas do pacote **"dplyr"** também incluído na coleção _tidyverse_. 
+
+Hadley Wickham, o autor de dplyr, o chama de **"A Grammar of Data Manipulation"** e é um pacote que ajuda na manipulação, limpeza e preparação de dados para o análise.
+
+O pacote contém diversas funções que permitem aplicar filtros, selecionar ou ordenar colunas, adicionar, deletar ou agregar dados. As funções são simples de chamar e lembrar o que facilita muito o seu uso.
+
+A seguinte tabela resume as funções principais.
+
+---
+
+
+|função    | descrição                         |exemplo                            |
+|----------|-----------------------------------|-----------------------------------|
+|filter()  | filtra ou seleciona linhas  | filter(dados, col3  > 50)         |
+|select()  |Seleciona colunas (variáveis)|select(dados, col3, col5, -col7)   |
+|mutate()  |Cria novas variáveis         |mutate(dados, novacol= col1/col4)  |
+|arrange() |Ordena os dados (desc)       |arrange(dados, col2, col3)         |
+|group_by()|Agrupa os dados acorde critério|group_by(dados, col1, col2)|
+|summarise()|Resume ou agrega os dados|Diversas estatísticas|
+|join()|Junta ou adiciona dataframes| join(dados1,dados2)|
+|distinct()|Elimina observações duplicadas analisando todas as variáveis|distinct(dados) veja?|
+|rename()|Muda o nome de uma variável|rename(dados, Coluna01=col1)|
+|sample_n()|Seleciona aleatoriamente linhas do arquivo|sample_n(dados, 10) |
+|sample_frac()|Seleciona aleatoriamente uma percentagem de linhas do arquivo|sample_frac(dados, 0.2)|
+
+---
+
+Vamos começar por carregar a biblioteca **dplyr** e também vamos carregar os dados da biblioteca **gapminder** (Gapminder <http://www.gapminder.org/data/>). No caso de não estarem instalados, use o instalador de pacotes primeiro.
+
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+library(gapminder)
+
+head(gapminder)
+```
+
+---
+
+---
+
+O operador **pipe (%>%)**
+
+O operador **pipe** é uma das grandes características do **tidyverse** e do **dplyr**. Ele permite encadear as funções, ou seja conectar um comando a um outro. 
+
+você começa um comando e o operador **pipe** **%>%** carrega a saída do lado esquerdo e a "canaliza" para comando do lado direito, ou seja a saída de um comando é a entrada do seguinte.
+
+Por exemplo:
+
+---
+
+
+```{r}
+gapminder %>% head()
+
+```
+
+
+Que foi feito aqui? passamos os dados da base Gapminder para a função _head_ que como já visto, mostra os primeiros registros do arquivo.
+
+Isto é o equivalente a dizer _head (gapminder)_. Isso não parece muito útil ... mas espere um pouco.
+
+
+---
+
+###Funções de dplyr
+
+---
+
+###filter ()
+
+Use **filter ()** para extrair um subconjunto de dados selecionado por linhas (row) as quais cumplam determinadas características.
+
+Como funciona?...
+
+São usadas expressões lógicas como entrada e retorna todas as linhas de seus dados para os quais essas expressões são verdadeiras.
+
+
+Veja como o filter () funciona:   _filter(gapminder, lifeExp<30)_
+
+Filtra todas as linhas que tem a variável "lifeExp" menor que 30, ou seja aqueles países em que a expectativa de vida é inferior a 30 anos.
+
+Na sequência vamos filtrar os dados que o banco de dados tem sobre o Brasil.
+
+
+```{r}
+filter(gapminder, lifeExp < 30)
+
+filter(gapminder, country =="Brazil")
+```
+
+
+Podemos adicionar varias colunas e valores desejados.Examine os seguintes códigos que usam a adição, ou condições lógicas como "OR" (|) ou "NOT" (!) :
+
+
+```{r}
+filter(gapminder, year == 1982 & lifeExp > 50 & continent == "Americas")
+
+filter(gapminder, year != 1982 | lifeExp > 50 & continent == "Americas")
+
+```
+
+
+A função externa **grepl** ajuda na procura de padrões nos registros. Veja como procurar por países que começem com a letra "F" na Europa e a data seja 1952 ou 1992:
+
+
+```{r}
+filter(gapminder, continent == "Europe")%>%
+  filter( year== 1952 | year == 1992)   %>% 
+    filter(grepl("F",country))
+
+```
+
+
+---
+
+---
+
+###select ()
+
+Falamos sobre o uso de **filter ()** para subconjunto de dados por linhas. Podemos usar **select ()** para fazer a mesma coisa, mas agora para colunas (col). Podemos eliminar colunas da seleção usando o sinal de "-". Vamos selecionar as colunas "year" e "lifeExp" e depois eliminar "continent" da seleção do arquivo:
+
+
+```{r}
+select(gapminder, year, lifeExp) # selecionamos apenas duas colunas
+select(gapminder, -continent)    # selecionamos todas as colunas a menos da "continent"
+select(gapminder, 1:6, -2)       # mesma seleção anterior, mas usando os números das colunas
+```
+
+
+Aqui faremos o mesmo, e vamos passarlo através de "head ()" para tornar a exibição mais compacta:
+
+
+```{r}
+gapminder %>%  
+  select(year, lifeExp) %>%    
+    head(4)
+
+```
+
+
+O seguinte fragmento de código vai colocar a variável "year" na frente de todas as outras variáveis. 
+
+```{r}
+g2 <- gapminder %>%  
+          select(year, everything()) %>%    
+          head(4)
+g2
+```
+
+
+---
+
+A função **select()** tem alguns complementos (helpers) muito úteis no momento da seleção de colunas, a seguinte tabela resume os principais:
+
+
+|complemento|descrição|Exemplo|
+|-----------|-------------------------------|-----------------------|
+|starts_with()|Seleciona inicio com um prefixo|select(dados, start_with("Nome"))|
+|ends_with()|Seleciona final com um prefixo|select(dados, ends_with("end"))|
+|contains()|Contém carateres ou texto|select(dados, contains("IBGE_"))|
+|matches()|Igual a uma expressão texto|select(dados, matches(".IBGE."))|
+|num_range()|Inclue uma amplitude numérica,como X01,x02,x03...|select(dados, num_range("X01:5"))|
+|one_of()|Variáveis num vetor caracter|select(dados, one_of(vars))|
+|everything()|Todas as variáveis|select(dados, everything())|
+
+---
+
+Vemos apenas um exemplo, selecionando colunas que contenham "co"...
+
+
+```{r}
+gapminder %>%  
+  select(matches("co")) %>%    
+    head(4)
+
+```
+
+---
+
+Vamos fazer algumas alterações aos nossos dados gapminder, para isso é recomendável começar criando uma cópia dos dados, com a finalidade de preservar os dados originais. _**Aliás, essa é uma importante dica, sempre trabalhe com uma cópia de seus dados originais!!**_
+
+
+```{r}
+new_gap <- gapminder
+```
+
+---
+
+---
+
+
+###mutate()
+
+**Mutate ()** é uma função que define uma nova variável e insere-a em seus dados. Por exemplo, a base de dados gapminder tem "PIB per capita"  e "população", se os  multiplicarmos, vamos obtemos o PIB (GDP).
+
+```{r}
+new_gap %>%
+  mutate(gdp = pop * gdpPercap)
+```
+
+
+Observe que o código acima cria um novo campo, "gdp" e exibe o resultado. Se quizermos salvar o cálculo numa outra variável, podemos usar o operador "<-" para guardar os mesmos. Por exemplo, vamos salvar o cálculo e ver o cabeçalho 
+
+
+```{r}
+gap_gdp <- new_gap %>%
+            mutate(gdp = pop * gdpPercap)
+head(gap_gdp)
+```
+
+
+A função **cumsum** permite, junto com **mutate** calcular totais acumulados de colunas.
+
+```{r}
+gap_gdp_cum <- gap_gdp %>% mutate(TotalAcumGDP = cumsum(gdp))
+
+select(gap_gdp_cum ,4:8) %>%
+  head( 10)
+```            
+
+---
+
+---
+
+###arrange()
+
+**arrange()**  reordena as linhas em um conjunto de dados. Os dados gapminder estão atualmente organizados por país e depois por ano. Mas e se quiséssemos olhar para ele por ano, e depois por país? A solução, usando **pipe** e **arrange()** seria:
+
+```{r}
+arrange(new_gap, year, country)
+```
+
+---
+
+---
+
+###group_by() and summarize()
+
+A função **group_by ()** agrupa informações dos dados, o que permite que você faça cálculos por conjuntos semelhantes. 
+
+A função **summarize ()** é um parceiro natural para **group_by ()**, já que resume um conjunto de dados com n observações e calcula as estatísticas solicitadas. Vejamos um exemplo, agrupando os dados por continente e pedindo o resumo:
+
+---
+
+```{r}
+new_gap %>%
+  group_by(continent) %>%
+  summarize(n = n())
+```
+
+
+---
+
+
+ As funções que você vai aplicar no **summarize()** incluem resumos estatísticos clássicos, como **mean()**, **median()**, **var()**, **sd()**, **mad()**, **IQR()**, **min()**, e **max()**. (_mad_ é median absolute deviation)
+
+ Lembre-se que são funções que tomam _n_ dados de entrada e as resume numa só saída. 
+
+
+```{r}
+new_gap %>%
+  group_by(continent) %>%
+  summarize(avg_lifeExp = mean(lifeExp))
+
+new_gap %>%
+  group_by(country =="Brazil") %>%
+  summarize(avg_lifeExp = mean(lifeExp))
+```
+
+---
+
+Uma variante, **summarise_at** permite selecionar várias variáveis pelo nome, sendo que **funs()** também permite escolher diversas estatísticas.Note o uso do ponto para adicionar mais uma condição, neste casso, omissão de valores faltantes (NAs).
+
+---
+
+```{r}
+new_gap %>%
+  group_by(continent) %>%
+  summarize_at(vars(lifeExp,pop), funs(n(),mean(.,na.rm=T),sd(.,na.rm=T)))
+```
+
+
+---
+
+Finalmente, podemos resumir todas as variáveis numéricas, da seguinte forma:
+
+1- armazene todas as variáveis numéricas
+
+2- use **sumarise_all**
+
+```{r}
+new_gap_num <- new_gap[sapply(new_gap, is.numeric)]
+new_gap_num %>%
+  summarize_all( funs(n(),mean(.,na.rm=T)))
+```
+
+
+A função **join** permite juntar dois dataframes e tem diversos complementos auxiliares, veja ?join.
+
+---
+
+---
+
+###Um excelente exemplo
+
+Para apreciar o potencial do comando _pipe_ e os comandos de manipulação de dados _dplyr_, dê uma olhada neste exemplo. Ele vem do curso de Jenny Brian, STAT545, da Universidade da Colúmbia Britânica, Estados Unidos.
+
+No exemplo vamos selecionar usando _select()_: continente, país, ano e expectativa de vida; 
+
+na sequência vamos agrupar por continente e país. 
+
+Logo criamos uma variável (_mutate_!), que calcula se a expectativa de vida vai diminuindo ou aumentando. 
+
+Depois calculamos os mínimos para cada continente e ordenamos pelos piores resultados. o código, comentado é:
+
+
+```{r}
+new_gap %>%
+  select(country, year, continent, lifeExp) %>%
+    group_by(continent, country) %>%
+## em cada país, calcule (lifeExp no ano i) - (lifeExp ano i - 1)...lag faz isso
+## valor positivo significa aumento de lifeExp, negativa diminuição...
+      mutate(le_delta = lifeExp - lag(lifeExp)) %>% 
+## em cada país, tome a menor lifeExp mudança ou a mais negativa
+        summarize(worst_le_delta = min(le_delta, na.rm = TRUE)) %>% 
+## em cada continente, tome a linha com a pior mudança: worst_le_delta
+          top_n(-1, wt = worst_le_delta) %>%  
+            arrange(worst_le_delta)      ## ordene
+```
+
+---
+
+**Dicas**: **veja ?lag e ?top_n**
+
+---
+
+_**Para citar a autora do código:
+Pense por um instante...veja o código e a variável analisada. O que está vendo é como aparece um genocidio em frias estatísticas de expectativa de vida...**_
+
+---
+
+---
+
+Vamos no final usar a base de dados gapminder para ter alguns dados dos países americanos e do Brasil.
+
+
+```{r}
+america <-  as.data.frame(new_gap %>%
+              filter(continent == "Americas") %>%
+              select(country, year, lifeExp) %>%
+              group_by(country) %>%
+## em cada país, calcule (lifeExp no ano i) - (lifeExp ano i - 1)...lag faz isso
+## valor positivo significa aumento de lifeExp, negativa diminuição...
+            mutate(le_delta = lifeExp - lag(lifeExp))  %>% 
+# ordenamos por país e ano...
+                arrange(country,year))
+# todo o arquivo
+america
+
+## qual o promedio de vida nesses dados??
+america %>%
+    filter(country =="Brazil") %>%
+    summarize(avg_lifeExp = mean(lifeExp))
+
+am2 <- america %>%
+          filter(country =="Brazil") %>%
+          arrange(lifeExp)
+
+plot(am2$year,am2$le_delta,
+     ylim= c(0,3),
+     type="l",
+     main="Brasil",
+     ylab="Aumento da expectativa de vida", 
+     xlab="Anos")
+```
+
+
+---
+
+FIM DA SESSÃO
+
+---
+
+```{r}
+sessionInfo()
+save(list = ls(), file = "03_tidy2_all.Rdata")
+```
+

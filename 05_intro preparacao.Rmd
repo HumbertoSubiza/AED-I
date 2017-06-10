@@ -119,7 +119,7 @@ library(psych)
 describe(air)
 ```
 
-Basicamente **glimpse()**  fornece a mesma informação do **str()**, mas no caso de **describe()**, ela fornece estatísticas mais completas que o **summary()** e conta a quantidade de valores existentes para cada variável (no caso de "Ozone", por exemplo, temos 116 valores num total de 156 registros).
+Basicamente **glimpse()**  fornece a mesma informação do **str()**, mas no caso de **describe()**, ela fornece estatísticas mais completas que o **summary()** e conta a quantidade de valores existentes para cada variável (no caso de "Ozone", por exemplo, temos 116 valores num total de 153 registros).
 
 ---
 

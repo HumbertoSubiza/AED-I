@@ -70,7 +70,7 @@ nomes2
 str_pad(nomes2, width = 25, pad = " ")
 # ou
 
-str_pad(str_trim(nomes), width = 25, pad = " ")
+str_pad(str_trim(nomes), width = 25, pad = " ", side="both")
 
 ```
 
@@ -120,7 +120,7 @@ Nessa última função temos o terceiro argumento que é o caracter que vai subs
 
 ####Exercício
 
-Com nosso dataframe "estados", procure os estados que pertencem a região Sul. Veja que colocamos o padrão de procura como "N$", de forma de indicar que o padrão deve **finalizar** com "N", se não especificamos assim, a função trará também os estados do nordeste ("ND").
+Com nosso dataframe "estados", procure os estados que pertencem a região Norte. Veja que colocamos o padrão de procura como "N$", de forma de indicar que o padrão deve **finalizar** com "N", se não especificamos assim, a função trará também os estados do nordeste ("ND").
 
 ```{r}
 estados[str_detect(estados$REGIÃO, "N$"),]
