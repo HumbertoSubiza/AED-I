@@ -3,6 +3,7 @@ title: "Análise Exploratório de Dados com R - Parte I"
 author: "Walter Humberto Subiza Pina"
 date: "9 de fevereiro de 2017"
 output:
+  word_document: default
   html_document: default
 ---
 
@@ -30,7 +31,7 @@ Vamos importar o arquivo _airquality.txt_, que está no nosso diretório de trab
 ---
 
 
-![Janela de importação do RStudio que aparece ao clicar em "Import Dataset"](C:/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar00.JPG)
+![Janela de importação do RStudio que aparece ao clicar em "Import Dataset"](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar00.JPG)
 
 ---
  
@@ -48,7 +49,7 @@ Nesse exemplo, a leitura do arquivo foi feita com delimitador padrão vírgula *
 
 ---
 
-![Janela de importação do RStudio depois da mudança de separador para espaço em branco " ".](C:/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar01.JPG)
+![Janela de importação do RStudio depois da mudança de separador para espaço em branco " ".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar01.JPG)
 
 ---
 
@@ -85,9 +86,9 @@ Na importação temos de fazer os seguintes passos:
 
 ---
 
-```{r warning = TRUE}
+```{r warning = FALSE}
 library(readr)
-demo03 <- read_delim("demo03.csv", 
+demo03 <- read_delim("~/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/01 texto/demo03.csv", 
      ";", 
      escape_double = FALSE, 
      col_types = cols(Bloco    = col_factor(levels = c("1", "2")), 
@@ -99,7 +100,7 @@ demo03 <- read_delim("demo03.csv",
 
 ---
 
-![Janela de importação do RStudio na importação de "demo03.csv".](C:/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar02.JPG)
+![Janela de importação do RStudio na importação de "demo03.csv".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar02.JPG)
 
 ---
 
@@ -141,7 +142,7 @@ Nas opções de importação (destaque 2), podemos selecionar qual planilha ou t
 
 ---
 
-![Janela de importação do RStudio na importação de "imagens.xlxs".](C:/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar03.JPG)
+![Janela de importação do RStudio na importação de "imagens.xlxs".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar03.JPG)
 
 ---
 
@@ -149,7 +150,7 @@ Já na importação de "imagens_semcab.xlxs", o arquivo carece de cabeçalho sen
 
 ---
 
-![Janela de importação do RStudio na importação de "imagens_semcab.xlxs".](C:/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar04.JPG)
+![Janela de importação do RStudio na importação de "imagens_semcab.xlxs".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar04.JPG)
 
 ---
 

@@ -1,8 +1,10 @@
 ---
 title: "Datas"
 author: "Walter Humberto Subiza Pina"
-date: "23 de março de 2017"
-output: html_document
+date: "23 de marÃ§o de 2017"
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}

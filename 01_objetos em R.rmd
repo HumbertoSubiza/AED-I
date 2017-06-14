@@ -2,7 +2,9 @@
 title: "Objetos em R"
 author: "Walter Humberto Subiza Pina"
 date: "10 de fevereiro de 2017"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -102,7 +104,7 @@ O dataframe é usado para armazenar tabelas. É um conjunto de vetores de igual 
 
 ```{r}
 pessoas <- c("Silvia", "Pedro", "João", "Marcela", "Maria", "Elizabet")
-idades <- c(5, 44, 39, 20, 30, NA)
+idades <- c(5, 44, 39, 20, 30, 66)
 parent <- c("Primo", "Irmão", "Irmão", "Primo", "Primo", "Tio")
 cidade <- c("Petropolis", "Rio", "Rio", "Friburgo", NA, "Rio")
 aposentado <- c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)
