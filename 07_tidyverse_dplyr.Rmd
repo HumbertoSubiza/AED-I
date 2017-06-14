@@ -1,8 +1,10 @@
 ---
-title:  "Oficina AED"
+title: "Oficina AED - Parte I"
 author: "Walter Humberto Subiza Pina"
-date: "21 de fevereiro de 2017"
-output: html_document
+date: "14 de junho de 2017"
+output:
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -24,24 +26,28 @@ Hadley Wickham, o autor de dplyr, o chama de **"A Grammar of Data Manipulation"*
 
 O pacote contém diversas funções que permitem aplicar filtros, selecionar ou ordenar colunas, adicionar, deletar ou agregar dados. As funções são simples de chamar e lembrar o que facilita muito o seu uso.
 
-A seguinte tabela resume as funções principais.
+A segunte tabela resume as funções principais.
 
 ---
 
 
-|função    | descrição                         |exemplo                            |
-|----------|-----------------------------------|-----------------------------------|
-|filter()  | filtra ou seleciona linhas  | filter(dados, col3  > 50)         |
-|select()  |Seleciona colunas (variáveis)|select(dados, col3, col5, -col7)   |
-|mutate()  |Cria novas variáveis         |mutate(dados, novacol= col1/col4)  |
-|arrange() |Ordena os dados (desc)       |arrange(dados, col2, col3)         |
-|group_by()|Agrupa os dados acorde critério|group_by(dados, col1, col2)|
-|summarise()|Resume ou agrega os dados|Diversas estatísticas|
-|join()|Junta ou adiciona dataframes| join(dados1,dados2)|
-|distinct()|Elimina observações duplicadas analisando todas as variáveis|distinct(dados) veja?|
-|rename()|Muda o nome de uma variável|rename(dados, Coluna01=col1)|
-|sample_n()|Seleciona aleatoriamente linhas do arquivo|sample_n(dados, 10) |
-|sample_frac()|Seleciona aleatoriamente uma percentagem de linhas do arquivo|sample_frac(dados, 0.2)|
+|função          | descrição                           |exemplo                                  |
+|------------------|-----------------------------------|-----------------------------------------|
+|filter()      | filtra ou seleciona linhas     | filter(dados, col3  > 50)                    |
+|select()       |Seleciona colunas (variáveis)   |select(dados, col3, col5, -col7)             |
+|mutate()       |Cria novas variáveis            |mutate(dados, novacol= col1/col4)            |
+|arrange()      |Ordena os dados (desc)          |arrange(dados, col2, col3)                   |
+|group_by()     |Agrupa os dados acorde critério   |group_by(dados, col1, col2)                |
+|summarise()     |Resume ou agrega os dados   |Diversas estatísticas                           |
+|join()     |Junta ou adiciona dataframes   | join(dados1,dados2)                              |
+|distinct()     |Elimina observações duplicadas analisando todas as variáveis|   distinct(dados)  |
+|rename()     |Muda o nome de uma variável|   rename(dados, Coluna01=col1)                        |
+|sample_n()     |Seleciona aleatoriamente linhas do arquivo|   sample_n(dados, 10)                |
+|sample_frac()     |Seleciona aleatoriamente uma percentagem de linhas do arquivo|   sample_n(dados, 0.2)|
+|pull()\*     |Seleciona colunas (variáveis), **retorna vetor!!**|  pull(dados, -1), pull(dados, year)|
+
+\* a partir da versão **dplyr 0.7.0**.
+
 
 ---
 
@@ -59,9 +65,9 @@ head(gapminder)
 
 ---
 
-O operador **pipe (%>%)**
+O operador **pipe (%>%)** _(Crtl+Shift+M)_
 
-O operador **pipe** é uma das grandes características do **tidyverse** e do **dplyr**. Ele permite encadear as funções, ou seja conectar um comando a um outro. 
+O operador **pipe** é uma das grandes características do **tidyverse** e do **dplyr**. Ele permite encadear as funções, ou seja conectar um comando a um outro. O operador vem do pacote **magrittr**, consulte a ajuda para mais informação. 
 
 você começa um comando e o operador **pipe** **%>%** carrega a saída do lado esquerdo e a "canaliza" para comando do lado direito, ou seja a saída de um comando é a entrada do seguinte.
 
@@ -71,7 +77,8 @@ Por exemplo:
 
 
 ```{r}
-gapminder %>% head()
+gapminder %>% 
+  head()
 
 ```
 
@@ -80,6 +87,7 @@ Que foi feito aqui? passamos os dados da base Gapminder para a função _head_ q
 
 Isto é o equivalente a dizer _head (gapminder)_. Isso não parece muito útil ... mas espere um pouco.
 
+Nos fragmentos de codigo a seguir vamos usar sempre mostrar a saída com _head()_, com efeito de poupar espaço digital e físico na documentação.
 
 ---
 
@@ -96,7 +104,34 @@ Como funciona?...
 São usadas expressões lógicas como entrada e retorna todas as linhas de seus dados para os quais essas expressões são verdadeiras.
 
 
-Veja como o filter () funciona:   _filter(gapminder, lifeExp<30)_
+Relembrando as expressões lógicas em R 
+
+|**Comparação**  | **descrição**     |  **exemplo**      |
+|----------------|-------------------|-------------------|
+| <  | Menor que...  |  col3  **>** 50    |
+| >  | Maior que...  |  col3  **<** 50    |
+| ==  | Igual a...  |  col3  **==** 50    |
+| <=  | Menor que ou Igual a...  |  col3  **<=** 50    |
+| >=  | Maior que ou Igual a...  |  col3  **>=** 50    |
+| !=  | Não Igual a...  |  col3  **!=** 50    |
+| %in%  | que esteja em...  |  col3  **%in%** 50    |
+| is.na  | É NA?  |  **is.na**(df)    |
+| !is.na  | Não seja NA  |  **!is.na**(df)    |
+
+---
+
+|**Comparação lógica** | **descrição**             |**exemplo**        |
+|----------------------|---------------------------|-------------------|
+| &  | e booleano  |  col3  **&** col6    |
+| \|  | ou booleano  |  col3   **\|** col6    |
+| xor  | exatamente ou  |  col3 ==50  **xor** col6 >50   |
+| !  | não  |  **!**col3   |
+| any  | qualquer que seja verdadeiro  |  **any** ==50   |
+| all  | todos os verdadeiros  |  **all** ==50   |
+
+---
+
+Veja como o filter () funciona:   _filter(gapminder, lifeExp < 30)_
 
 Filtra todas as linhas que tem a variável "lifeExp" menor que 30, ou seja aqueles países em que a expectativa de vida é inferior a 30 anos.
 
@@ -104,9 +139,11 @@ Na sequência vamos filtrar os dados que o banco de dados tem sobre o Brasil.
 
 
 ```{r}
-filter(gapminder, lifeExp < 30)
+filter(gapminder, lifeExp < 30) %>% 
+  head()
 
-filter(gapminder, country =="Brazil")
+filter(gapminder, country =="Brazil") %>% 
+  head()
 ```
 
 
@@ -114,9 +151,11 @@ Podemos adicionar varias colunas e valores desejados.Examine os seguintes códig
 
 
 ```{r}
-filter(gapminder, year == 1982 & lifeExp > 50 & continent == "Americas")
+filter(gapminder, year == 1982 & lifeExp > 50 & continent == "Americas") %>% 
+  head()
 
-filter(gapminder, year != 1982 | lifeExp > 50 & continent == "Americas")
+filter(gapminder, year != 1982 | lifeExp > 50 & continent == "Americas") %>% 
+  head()
 
 ```
 
@@ -198,6 +237,25 @@ gapminder %>%
 
 ---
 
+### Novidade!!
+
+A partir da versão 0.7.0 de **dplyr** de 12 de junho de 2017, incorporou-se uma nova função genêrica, chamada **pull()**.
+
+Essa função permite selecionar uma coluna única, indicando seu nome ou posição, mas a diferencia de **select**, o resultado é um vetor, em vez de um dataframe como **select** faz. 
+
+Vejamos um exemplo, no qual selecionamos a coluna "year", na sequência vamos ver a estrutura da saída e mostrar apenas 10 registros, por causa da extensão do vetor( 1704 registros):
+
+---
+
+```{r}
+gapminder %>% 
+  pull(3) %>% 
+  str() %>% 
+  head(10)
+```
+
+---
+
 Vamos fazer algumas alterações aos nossos dados gapminder, para isso é recomendável começar criando uma cópia dos dados, com a finalidade de preservar os dados originais. _**Aliás, essa é uma importante dica, sempre trabalhe com uma cópia de seus dados originais!!**_
 
 
@@ -212,21 +270,34 @@ new_gap <- gapminder
 
 ###mutate()
 
-**Mutate ()** é uma função que define uma nova variável e insere-a em seus dados. Por exemplo, a base de dados gapminder tem "PIB per capita"  e "população", se os  multiplicarmos, vamos obtemos o PIB (GDP).
+**Mutate ()** é uma função que define uma nova variável e insere-a em seus dados. 
+
+Uma grande vantagem de **mutate()** é a de poder criar novas variáveis a partir das que está criando.
+
+Por exemplo, a base de dados gapminder tem "PIB per capita"  e "população", se os  multiplicarmos, vamos obtemos o PIB (GDP).
+
+---
+
 
 ```{r}
 new_gap %>%
-  mutate(gdp = pop * gdpPercap)
+  mutate(gdp = pop * gdpPercap) %>% 
+  head()
 ```
 
 
-Observe que o código acima cria um novo campo, "gdp" e exibe o resultado. Se quizermos salvar o cálculo numa outra variável, podemos usar o operador "<-" para guardar os mesmos. Por exemplo, vamos salvar o cálculo e ver o cabeçalho 
+Observe que o código acima cria um novo campo, "gdp" e exibe o resultado. Se quizermos salvar o cálculo numa outra variável, podemos usar o operador "<-" para guardar os mesmos. 
+
+Por exemplo, vamos salvar o cálculo e ver o cabeçalho, aproveitando para, no mesmo código, criar mais uma variável "gdpmil", a partir da variável "gdp" que estamos criando.
+
+---
 
 
 ```{r}
 gap_gdp <- new_gap %>%
-            mutate(gdp = pop * gdpPercap)
-head(gap_gdp)
+            mutate(gdp = pop * gdpPercap, gdpmil = gdp/1000)
+head(gap_gdp[, c(1,3:8)])  %>% #  deixamos fora a coluna 2, "continent"
+  head() 
 ```
 
 
@@ -241,6 +312,21 @@ select(gap_gdp_cum ,4:8) %>%
 
 ---
 
+**mutate()** tem uma série de funções úteis além de _cumsum()_, que são chamadas operações vetorizadas, já que o resultado é um vetor, dentre elas:
+
+---
+
+|função            | descrição                           |  exemplo                              |
+|------------------|-----------------------------------|-----------------------------------------|
+|pmax(), pmin()     | Mínimo e máximo vetorizado     |  pmax(col3, col4)                    |
+|cumprod()     | acumulado do produto     |  cumprod(col3)                    |
+|between()     | existem valores entre **a** e **b** ?    | between(col3, 10,50) retorna booleano, pode ser usado para extrair subconjuntos como: df[between(df$col3, 40,60),) |
+|cummean()     | média acumulada     |  cummean(col3)                    |
+|lead(), lag()    | copia valores uma posição a mais ou a menos     |  lag(i) é o valor anterior a **i**       |
+|dense_rank(), min_rank(), percent_rank(), row_number()| diversos métodos para ranking|    ---- |
+
+---
+
 ---
 
 ###arrange()
@@ -248,10 +334,27 @@ select(gap_gdp_cum ,4:8) %>%
 **arrange()**  reordena as linhas em um conjunto de dados. Os dados gapminder estão atualmente organizados por país e depois por ano. Mas e se quiséssemos olhar para ele por ano, e depois por país? A solução, usando **pipe** e **arrange()** seria:
 
 ```{r}
-arrange(new_gap, year, country)
+new_gap %>% 
+  arrange( year, country) %>% 
+  head()
+
 ```
 
 ---
+
+---
+### Novidade!!
+
+A partir da versão 0.7.0 de **dplyr** de 12 de junho de 2017, **arrange()** ganhou um argumento para poder escolher ordenar por grupos, com diferentes variantes, como **arrange_all**, **arrange_at** e **arrange_if**. Veja a documentação.
+
+
+```{r}
+gapminder %>% 
+  arrange_at(.,"continent") %>% 
+  summarise_if(is.numeric, mean) %>% 
+  select(-2) 
+```
+
 
 ---
 
@@ -266,16 +369,20 @@ A função **summarize ()** é um parceiro natural para **group_by ()**, já que
 ```{r}
 new_gap %>%
   group_by(continent) %>%
-  summarize(n = n())
+  summarize(paises = n(), 
+            media.exp.vida = mean(lifeExp), 
+            max.exp.vida   = max (lifeExp), 
+            min.exp.vida   = min (lifeExp)) %>%
+  arrange(desc(media.exp.vida))
 ```
-
 
 ---
 
+ As funções que você vai aplicar no **summarize()** incluem resumos estatísticos clássicos, como **mean()**, **median()**, **var()**, **sd()**, **mad()** (_mad_ é median absolute deviation), **IQR()**, **min()**, e **max()**,
+ **n()** (número de valores no vetor), dentre outras. 
+ 
 
- As funções que você vai aplicar no **summarize()** incluem resumos estatísticos clássicos, como **mean()**, **median()**, **var()**, **sd()**, **mad()**, **IQR()**, **min()**, e **max()**. (_mad_ é median absolute deviation)
-
- Lembre-se que são funções que tomam _n_ dados de entrada e as resume numa só saída. 
+ Lembre-se que são funções que tomam _n_ dados de entrada e as resume numa só saída, diferente das opções de **mutate()**. 
 
 
 ```{r}
@@ -290,6 +397,23 @@ new_gap %>%
 
 ---
 
+Um outro exemplo, 
+
+```{r}
+exp.vida.americas <- new_gap %>%
+  filter(continent =="Americas" ) %>% 
+  group_by(country) %>%    
+  summarize(avg_lifeExp = mean(lifeExp)) %>% 
+  arrange(desc(avg_lifeExp))
+
+as.data.frame(exp.vida.americas) %>% 
+  head(10)
+
+```
+
+
+---
+
 Uma variante, **summarise_at** permite selecionar várias variáveis pelo nome, sendo que **funs()** também permite escolher diversas estatísticas.Note o uso do ponto para adicionar mais uma condição, neste casso, omissão de valores faltantes (NAs).
 
 ---
@@ -297,7 +421,10 @@ Uma variante, **summarise_at** permite selecionar várias variáveis pelo nome, 
 ```{r}
 new_gap %>%
   group_by(continent) %>%
-  summarize_at(vars(lifeExp,pop), funs(n(),mean(.,na.rm=T),sd(.,na.rm=T)))
+  summarize_at(vars(lifeExp, pop), 
+               funs(n(), 
+                    mean(.,na.rm=T), 
+                    sd(.,na.rm=T)))
 ```
 
 
@@ -312,13 +439,13 @@ Finalmente, podemos resumir todas as variáveis numéricas, da seguinte forma:
 ```{r}
 new_gap_num <- new_gap[sapply(new_gap, is.numeric)]
 new_gap_num %>%
-  summarize_all( funs(n(),mean(.,na.rm=T)))
+  summarize_all( funs(n(), 
+                      mean(.,na.rm=T)))
 ```
 
+---
 
 A função **join** permite juntar dois dataframes e tem diversos complementos auxiliares, veja ?join.
-
----
 
 ---
 
@@ -376,12 +503,14 @@ america <-  as.data.frame(new_gap %>%
 # ordenamos por país e ano...
                 arrange(country,year))
 # todo o arquivo
-america
+america %>% 
+  head(15)
 
 ## qual o promedio de vida nesses dados??
 america %>%
     filter(country =="Brazil") %>%
-    summarize(avg_lifeExp = mean(lifeExp))
+    summarize(avg_lifeExp = mean(lifeExp)) %>% 
+  head()
 
 am2 <- america %>%
           filter(country =="Brazil") %>%

@@ -1,14 +1,15 @@
 ---
 title: "Oficina AED"
 author: "Walter Humberto Subiza Pina"
-date: "24 de fevereiro de 2017"
-output: html_document
+date: "14 de junho de 2017"
+output:
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-#library(tidyverse)
-library(tidyr)
+library(tidyverse)
 ```
 
 ## Introdução ao Análise Exploratório de Dados
@@ -32,6 +33,14 @@ Voltamos aos princípios da exploração de dados, os dados tem de estar arrumad
 ---
 
 ####3- Apenas um tipo de pesquisa por tabela
+
+---
+
+Com isso automáticamente conseguimos:
+
+  1- facilidade de acesso às variáveis
+  
+  2- preservamos as observações
 
 ---
 

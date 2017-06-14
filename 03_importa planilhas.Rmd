@@ -2,7 +2,9 @@
 title: "Importando Planilhas"
 author: "Walter Humberto Subiza Pina"
 date: "13 de fevereiro de 2017"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}

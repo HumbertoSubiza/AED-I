@@ -2,7 +2,9 @@
 title: "Análise Exploratório de Dados com R - Parte I"
 author: "Walter Humberto Subiza Pina"
 date: "9 de fevereiro de 2017"
-output: html_document
+output:
+#  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -71,22 +73,6 @@ Para não ter de especificar sempre os mesmos parâmetros, surgiram algumas fun�
 
 ### Outros pacotes a explorar
 
-_readr_
-Criado por Hadley Wickman (RStudio), é um pacote rápido, consistente e de fácil uso. 
-Ele deve ser carregado como pacote primeiro (install.packages +library).
-Veja ?readr. Esse pacote foi inserido há pouco tempo na coleção de pacotes _tidyverse_, que veremos com mais detalhe quando da preparação e limpeza de dados.
-
-A função principal é _read_delim_, com funções derivadas _read_csv_ e _read_tsv_.
-
----
-
-
-```{r warning=FALSE}
-library(readr)
-read_tsv("old_faith.txt")
-
-```
-
 ---
 
 Um outro pacote interessante para importação de dados texto é _data.table_.
@@ -105,7 +91,7 @@ fread("old_faith.txt")
 
 **Exercício**
 
-1- Importar arquivo tabela01 com _read.table_ e _readr_. Salve com nomes diferentes e imprima os 6 primeiros registros e os 3 últimos de cada um.
+1- Importar arquivo tabela01 com _read.table_ e _fread_. Salve com nomes diferentes e imprima os 6 primeiros registros e os 3 últimos de cada um.
 
 2-  Importar "demo03.csv" usando o leitor adequado de read.table, imprima em tela os primeiros 15 registros. 
  Investigue os dados importados e faça um sumário
