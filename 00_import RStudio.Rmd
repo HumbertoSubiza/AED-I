@@ -1,22 +1,25 @@
 ---
 title: "Análise Exploratório de Dados com R - Parte I"
 author: "Walter Humberto Subiza Pina"
-date: "9 de fevereiro de 2017"
+date: "`r format(Sys.Date())`"
 output:
-  word_document: default
+#  word_document: default
   html_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo      = TRUE,
+                      message   = FALSE,
+                      warning   = FALSE,
+                      fig.ext   = 'png',
+                      fig.align = 'center')
 ```
 
-## Importando arquivos com a nova versão 1 do RStudio
+## Importando arquivos com RStudio
 
 A partir da versão 1.0 do RStudio, as funções de importação de dados texto, planilhas e dados de estatística, foram incorporadas como um adicional no _"Import Dataset"_, já existente na janela 2 (janela de ambiente, histórico e arquivos). 
 
-As novas opções implementam o pacote tidyverse, nas funções readr(como read_table, read_csv, etc), readxl e haven.
-veja RStudio Blog - tidyverse 1.0.0 em <https://blog.rstudio.org/2016/09/15/tidyverse-1-0-0/>
+As novas opções implementam o pacote tidyverse, nas funções readr(como read_table, read_csv, etc), assim como permitem importar arquivos do excel e de arquivos dos softwares SPSS, SAS e STATA.
 
 ---
 
@@ -31,7 +34,7 @@ Vamos importar o arquivo _airquality.txt_, que está no nosso diretório de trab
 ---
 
 
-![Janela de importação do RStudio que aparece ao clicar em "Import Dataset"](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar00.JPG)
+![Janela de importação do RStudio que aparece ao clicar em "Import Dataset"](C:/Users/Walter Pina/Documents/Github/AED-I/importar00.JPG)
 
 ---
  
@@ -41,30 +44,29 @@ Nesta janela salientamos em vermelho o seguinte:
 
 2- uma pre-visualização dos dados onde podemos conferir como o nosso arquivo será importado. Note-se que reconhece automáticamente que a primeira linha tem os nomes das variáveis e que os dados estão agrupados sem um reconhecimento do separador de variáveis.
 
-3- Opções de importação, aqui podemos personalizar nossa importação, podemos começar a leitura numa linha determinada com a opção "skip" por exemplo, ou determinar qual realmente é o delimitador de variáveis correto, também podemos determinar qual o simbolo usado para separar números decimais ("Locale")
+3- Opções de importação, aqui podemos personalizar nossa importação, podemos começar a leitura numa linha determinada com a opção "skip" por exemplo, ou determinar qual realmente é o delimitador de variáveis correto, também podemos determinar qual o separador de números decimais ( ver a opção "Locale" para sua configuração)
 
-4- Finalmente todas as nossas opções aparecem codificadas na última janela, podemos também inserir outras modificações aqui.
+4- Finalmente todas as nossas opções aparecem codificadas na última janela, podemos também inserir outras modificações aqui. Este código pode ser copiado para nosso script se desejar.
 
-Nesse exemplo, a leitura do arquivo foi feita com delimitador padrão vírgula **","**, mas não está correto, mudamos essa opção para espaço em branco ("whitespace")  e vemos a mudança que deve ser a seguinte:
+Nesse exemplo, a leitura do arquivo foi feita com delimitador padrão vírgula **","**, mas não está correto, mudamos essa opção para espaço em branco ("whitespace") e vemos a mudança que deve ser a seguinte:
 
 ---
 
-![Janela de importação do RStudio depois da mudança de separador para espaço em branco " ".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar01.JPG)
+![Janela de importação do RStudio depois da mudança de separador para espaço em branco " ".](C:/Users/Walter Pina/Documents/Github/AED-I/importar01.JPG)
 
 ---
 
 Sempre devemos conhecer o formato do arquivo que importamos, principalmente:
 
-1. os dados tem cabeçalho? ou só observações?
+1. os dados tem cabeçalho com os nomes das colunas? ou só são observações?
 
-2. qual o separador de campos ou colunas?
+2. qual é o separador de campos ou colunas?
 
-3. qual o separador decimal?
+3. qual é o separador decimal?
 
-4. existem colunas de texto ou numéricas a serem tratadas como fatores? Se sim, quais os diferentes níveis?
+4. existem colunas de texto ou numéricas a serem tratadas como fatores? Se sim, quais os diferentes níveis? Neste caso é mais prático determinar as colunas fatores e seus níveis depois da importação
 
 5. existem valores faltantes? NAs?
-
 
 ---
 
@@ -88,38 +90,37 @@ Na importação temos de fazer os seguintes passos:
 
 ```{r warning = FALSE}
 library(readr)
-demo03 <- read_delim("~/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/01 texto/demo03.csv", 
+demo03 <- read_delim("C:/Users/Walter Pina/Documents/Github/AED-I/datasets/demo03.csv", 
      ";", 
      escape_double = FALSE, 
-     col_types = cols(Bloco    = col_factor(levels = c("1", "2")), 
-                     Sub.Bloco = col_factor(levels = c("01A", "01B", "01C", "2")), 
-     X1 = col_skip()), 
-     locale = locale(decimal_mark = ","), 
+     col_types     = cols(Bloco     = col_factor(levels = c("1", "2")), 
+                          Sub.Bloco = col_factor(levels = c("01A", "01B", "01C", "2")), 
+     X1      = col_skip()), 
+     locale  = locale(decimal_mark = ","), 
      trim_ws = TRUE)                     # trim whitespace, remove leading or trailing ws from characters
 ```
 
 ---
 
-![Janela de importação do RStudio na importação de "demo03.csv".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar02.JPG)
+![Janela de importação do RStudio na importação de "demo03.csv".](C:/Users/Walter Pina/Documents/Github/AED-I/importar02.JPG)
 
 ---
 
-Nem sempre a importação através de "Import Dataset" da certo. Por isso devemos conhecer outras formas de importação como as já vistas através da função _read.table_ e derivadas do pacote base *utils* . 
+Em arquivo cuja importação automática oferece alguma dificultade temos outras opções, como a função _read.table_ e derivadas do pacote base *utils*. 
 
 A mencionada função é carregada automaticamente quando o R é iniciado e lê qualquer arquivo em forma de tabela e carrega como um dataframe, possuindo um grande número de argumentos que permitem controlar a importação.
 
 Como padrão, a função assume que o arquivo não tem cabeçalho, o separador de campos é espaço e o separador decimal é “.”. Outras opções podem ser consultadas com ?read.table.
 
-No caso do seguinte exemplo do arquivo separado por vários espaços em branco "old_faith.txt", vamos importar pela janela 2 e com a função read.table.
+No caso do seguinte exemplo, o arquivo "old_faith.txt" tem as colunas separadas por diferente quantidades de espaços em branco, vamos importar o mesmo pela janela 2 e com a função read.table.
 
-A importação com a janela 2, não reconhece os vários campos em branco entre colunas e termina importando como uma variável só.
-
-Já a função _read.table_, apenas especificando que o arquivo tem cabeçalho...
+A função _read.table_, apenas especificando que o arquivo tem cabeçalho:
 
 ---
 
 ```{r}
-old <- read.table("old_faith.txt", header = T)
+old <- read.table("datasets/old_faith.txt", header = T)
+head(old)
 ```
 
 
@@ -128,13 +129,13 @@ old <- read.table("old_faith.txt", header = T)
 
 Importar arquivo "airquality.txt" com "Import Dataset" e com read.table. Salve com nomes diferentes e imprima os 6 primeiros registros e os 3 últimos de cada um. Consulte as opções de read.table.
 
-Porquê acha que nesse exemplo a importação foi feita corretamente? qual a diferença de formato entre os arquivos "old_faith.txt" e "airquality.txt"?
+Qual a diferença de formato entre os arquivos "old_faith.txt" e "airquality.txt"?
 
 ---
 
 ####2- Arquivos planilhas Excel
 
-Também é possível importar arquivos Excel a partir da opção "Import Dataset". Vamos importar os arquivos "imagens.xlxs" e "imagens_semcab.xlxs".
+Também é possível importar arquivos Excel a partir da opção "Import Dataset/From Excel...". Vamos importar os arquivos "imagens.xlxs" e "imagens_semcab.xlxs".
 
 No caso do primeiro arquivo, vemos que o cabeçalho foi automaticamente reconhecido, assim como os tipos de variáveis (destaque vermelho 1). 
 
@@ -142,15 +143,15 @@ Nas opções de importação (destaque 2), podemos selecionar qual planilha ou t
 
 ---
 
-![Janela de importação do RStudio na importação de "imagens.xlxs".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar03.JPG)
+![Janela de importação do RStudio na importação de "imagens.xlxs".](C:/Users/Walter Pina/Documents/Github/AED-I/importar03.JPG)
 
 ---
 
-Já na importação de "imagens_semcab.xlxs", o arquivo carece de cabeçalho sendo necessário especificar a opção. Os nomes das variáveis serão automáticamente asignados a "X__0", "X__1", ...etc, veja a captura de tela seguinte:
+Já na importação de "imagens_semcab.xlxs", o arquivo carece de cabeçalho sendo necessário especificar a opção. Os nomes das variáveis serão automáticamente asignados a "...1", "...2", "...3" etc, veja a captura de tela seguinte:
 
 ---
 
-![Janela de importação do RStudio na importação de "imagens_semcab.xlxs".](C:/Users/humberto.pina/Documents/cursos IBGE/Cursos2017/Oficina AED com R-I/02 R/01 Importação/00_RStudio/importar04.JPG)
+![Janela de importação do RStudio na importação de "imagens_semcab.xlxs".](C:/Users/Walter Pina/Documents/Github/AED-I/importar04.JPG)
 
 ---
 
@@ -160,12 +161,12 @@ Exercício: importe o arquivo "urbanpop.xls", tabela "1975-2011"
 
 ####3- Arquivos de pacotes estatísticos
 
-A importação de arquivos provenientes de pacotes estatísticos é facilitada pela opção "Import Dataset". Práticamente todos os formatos são suportados, como
+A importação de arquivos provenientes de pacotes estatísticos é facilitada pela opção "Import Dataset/From...". Práticamente todos os formatos são suportados, como
 SAS, SAV, rda e dta. 
 
 Exercício:
 
-Vamos proceder a importação dos seguintes arquivos do diretório 01 Importação\03 estats:
+Vamos proceder a importação dos seguintes arquivos do diretório /datasets:
 
 1- "vendas.sas7bdat" -  (SAS)
 
